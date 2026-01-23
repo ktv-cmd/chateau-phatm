@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Order, OrderItem } from '@/lib/types'
 import { supabaseClient } from '@/lib/db/supabaseClient'
 import { getCustomerName } from '@/lib/db/owner'
-import { markOrderSheetSync, updateOrderStatus } from '@/lib/db/orders'
+import { markOrderSheetSync } from '@/lib/db/orders'
 import { sendOrderToSheets } from '@/lib/sheets'
 
 interface OwnerOrderDetailProps {
@@ -18,15 +18,26 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
   const router = useRouter()
   const [isUpdating, setIsUpdating] = useState(false)
   const [newStatus, setNewStatus] = useState<Order['status']>(order.status)
+  const [statusError, setStatusError] = useState<string | null>(null)
   const [isResending, setIsResending] = useState(false)
 
   async function handleStatusUpdate() {
     setIsUpdating(true)
-    const { error } = await updateOrderStatus(supabaseClient, order.id, newStatus)
+    setStatusError(null)
+    const response = await fetch(`/api/owner/orders/${order.id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    })
 
-    if (!error) {
-      router.refresh()
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null)
+      setStatusError(payload?.error || 'Unable to update order status.')
+      setIsUpdating(false)
+      return
     }
+
+    router.refresh()
     setIsUpdating(false)
   }
 
@@ -117,6 +128,11 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
                 {isUpdating ? 'Updating...' : 'Update Status'}
               </button>
             </div>
+            {statusError && (
+              <p className="mt-2 text-sm text-red-600" role="alert">
+                {statusError}
+              </p>
+            )}
           </div>
 
           {order.delivery_address_snapshot && (

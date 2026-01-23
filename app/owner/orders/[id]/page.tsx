@@ -6,6 +6,8 @@ import { getCustomerEmail } from '@/lib/db/owner'
 import { getOrderById, getOrderItems } from '@/lib/db/orders'
 import { OwnerOrderDetail } from '@/components/OwnerOrderDetail'
 
+export const dynamic = 'force-dynamic'
+
 interface OwnerOrderPageProps {
   params: { id: string }
 }

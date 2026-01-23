@@ -219,7 +219,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                     required
                     aria-required="true"
                     value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, firstName: e.target.value }))}
                     className={errors.firstName ? 'input-error' : 'input'}
                     aria-describedby={errors.firstName ? 'firstName-error' : undefined}
                     aria-invalid={errors.firstName ? 'true' : 'false'}
@@ -240,7 +240,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                     required
                     aria-required="true"
                     value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, lastName: e.target.value }))}
                     className={errors.lastName ? 'input-error' : 'input'}
                     aria-describedby={errors.lastName ? 'lastName-error' : undefined}
                     aria-invalid={errors.lastName ? 'true' : 'false'}
@@ -263,7 +263,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                   required
                   aria-required="true"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
                   className={errors.phone ? 'input-error' : 'input'}
                   aria-describedby={errors.phone ? 'phone-error' : undefined}
                   aria-invalid={errors.phone ? 'true' : 'false'}
@@ -285,7 +285,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                   required
                   aria-required="true"
                   value={formData.addressLine1}
-                  onChange={(e) => setFormData({ ...formData, addressLine1: e.target.value })}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, addressLine1: e.target.value }))}
                   className={errors.addressLine1 ? 'input-error' : 'input'}
                   aria-describedby={errors.addressLine1 ? 'addressLine1-error' : undefined}
                   aria-invalid={errors.addressLine1 ? 'true' : 'false'}
@@ -305,7 +305,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                   id="addressLine2"
                   type="text"
                   value={formData.addressLine2}
-                  onChange={(e) => setFormData({ ...formData, addressLine2: e.target.value })}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, addressLine2: e.target.value }))}
                   className="input"
                 />
               </div>
@@ -321,7 +321,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                     required
                     aria-required="true"
                     value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, city: e.target.value }))}
                     className={errors.city ? 'input-error' : 'input'}
                     aria-describedby={errors.city ? 'city-error' : undefined}
                     aria-invalid={errors.city ? 'true' : 'false'}
@@ -343,7 +343,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                     aria-required="true"
                     maxLength={2}
                     value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value.toUpperCase() })}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, state: e.target.value.toUpperCase() }))}
                     className={errors.state ? 'input-error' : 'input'}
                     aria-describedby={errors.state ? 'state-error' : undefined}
                     aria-invalid={errors.state ? 'true' : 'false'}
@@ -367,7 +367,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                   required
                   aria-required="true"
                   value={formData.zip}
-                  onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, zip: e.target.value }))}
                   className={errors.zip ? 'input-error' : 'input'}
                   aria-describedby={errors.zip ? 'zip-error' : undefined}
                   aria-invalid={errors.zip ? 'true' : 'false'}
@@ -387,7 +387,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                   id="notes"
                   rows={4}
                   value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
                   className="input"
                   aria-describedby="notes-help"
                 />

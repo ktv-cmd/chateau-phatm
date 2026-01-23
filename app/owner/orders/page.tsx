@@ -6,6 +6,8 @@ import { listOrders } from '@/lib/db/orders'
 import { logger } from '@/lib/logger'
 import { OwnerOrdersList } from '@/components/OwnerOrdersList'
 
+export const dynamic = 'force-dynamic'
+
 interface OwnerOrdersPageProps {
   searchParams: { status?: string }
 }
