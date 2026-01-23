@@ -54,8 +54,9 @@ export async function middleware(request: NextRequest) {
         console.log(`[MIDDLEWARE] Cookie value is valid JSON, keys:`, Object.keys(parsed))
         fetch('http://127.0.0.1:7242/ingest/160a94b3-1cf1-4047-acd7-ddbf3ee386d7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'middleware.ts:55',message:'Cookie value parsed',data:{isValidJSON:true,keys:Object.keys(parsed),hasAccessToken:!!parsed.access_token,hasRefreshToken:!!parsed.refresh_token},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'E'})}).catch(()=>{});
       } catch (e) {
-        console.log(`[MIDDLEWARE] Cookie value is NOT valid JSON:`, e.message)
-        fetch('http://127.0.0.1:7242/ingest/160a94b3-1cf1-4047-acd7-ddbf3ee386d7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'middleware.ts:60',message:'Cookie value parse failed',data:{error:e.message,valueStart:supabaseCookie.value.substring(0,100)},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'E'})}).catch(()=>{});
+        const errorMessage = e instanceof Error ? e.message : String(e)
+        console.log(`[MIDDLEWARE] Cookie value is NOT valid JSON: ${errorMessage}`)
+        fetch('http://127.0.0.1:7242/ingest/160a94b3-1cf1-4047-acd7-ddbf3ee386d7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'middleware.ts:60',message:'Cookie value parse failed',data:{error:errorMessage,valueStart:supabaseCookie.value.substring(0,100)},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'E'})}).catch(()=>{});
       }
     }
   }
