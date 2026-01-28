@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: 'Chateau Drug & Homecare - Your Trusted Neighborhood Pharmacy',
   description: 'Fast, friendly service • Local delivery options • Homecare supplies',
   icons: {
-    icon: '/icon.png',
+    icon: '/favicon.ico',
     apple: '/apple-icon.png',
   },
 }
