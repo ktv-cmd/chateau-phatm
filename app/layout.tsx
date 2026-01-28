@@ -9,6 +9,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Chateau Drug & Homecare - Your Trusted Neighborhood Pharmacy',
   description: 'Fast, friendly service • Local delivery options • Homecare supplies',
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+  },
 }
 
 export default function RootLayout({
