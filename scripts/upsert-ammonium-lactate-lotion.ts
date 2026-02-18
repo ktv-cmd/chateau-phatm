@@ -15,6 +15,15 @@ const supabase = createClient(supabaseUrl, serviceKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 })
 
+function parseCentsFromDisplay(value?: string) {
+  if (!value) return null
+  const normalized = value.replace(/[^0-9.]/g, '')
+  if (!normalized) return null
+  const num = Number.parseFloat(normalized)
+  if (Number.isNaN(num)) return null
+  return Math.round(num * 100)
+}
+
 async function ensureVariant(params: {
   base: string
   variantSize: string
@@ -23,6 +32,8 @@ async function ensureVariant(params: {
   priceDisplay?: string
 }) {
   const name = `${params.base} (${params.variantSize})`
+  const priceCents =
+    params.priceDisplay && params.priceDisplay.toLowerCase().includes('call') ? null : parseCentsFromDisplay(params.priceDisplay)
 
   const lookup = await supabase
     .from('products')
@@ -44,6 +55,7 @@ async function ensureVariant(params: {
         ...(params.sku ? { sku: params.sku } : {}),
         ...(params.imageUrl ? { image_url: params.imageUrl } : {}),
         ...(params.priceDisplay ? { price_display: params.priceDisplay } : {}),
+        ...(typeof priceCents === 'number' ? { price_cents: priceCents } : {}),
         is_active: true,
       })
       .eq('id', id)
@@ -64,6 +76,7 @@ async function ensureVariant(params: {
       image_url: params.imageUrl || null,
       sku: params.sku || null,
       price_display: params.priceDisplay || 'Call for Price',
+      price_cents: typeof priceCents === 'number' ? priceCents : null,
       in_stock: true,
       is_active: true,
     })
