@@ -2,7 +2,15 @@ import { searchMeili, MeilisearchUnavailableError } from '@/lib/search/meilisear
 import { parseQuery } from '@/lib/search/parseQuery'
 import { rankProducts } from '@/lib/search/rank'
 import { fixtureProducts } from '@/lib/search/fixtures'
-import { SearchFilters, SearchOptions, SearchResponse, SearchResultItem, SearchSuggestion, SearchSafety } from '@/lib/search/types'
+import {
+  SearchFilters,
+  SearchOptions,
+  SearchResponse,
+  SearchResultItem,
+  SearchSafety,
+  SearchSafetyWarning,
+  SearchSuggestion
+} from '@/lib/search/types'
 import { normalizeQuery } from '@/lib/search/normalizeQuery'
 import { SYMPTOM_MAP, expandSynonyms } from '@/lib/search/synonyms'
 import { SAFETY_RULES } from '@/lib/search/safetyRules'
@@ -118,36 +126,32 @@ function buildSuggestions(items: SearchResultItem[], query: string): SearchSugge
 }
 
 function buildSafety(signals: ReturnType<typeof parseQuery>): SearchSafety {
-  const warnings = SAFETY_RULES.flatMap((rule) => {
-    if (!signals.ageIntent || rule.age_group !== signals.ageIntent) return []
-    if (!signals.detectedIngredients.includes(rule.ingredient)) return []
+  const warnings: SearchSafetyWarning[] = []
+  for (const rule of SAFETY_RULES) {
+    if (!signals.ageIntent || rule.age_group !== signals.ageIntent) continue
+    if (!signals.detectedIngredients.includes(rule.ingredient)) continue
 
     if (rule.disallow) {
-      return [
-        {
-          code: 'age-ingredient-restriction',
-          message: rule.warning_text,
-          severity: 'critical' as const,
-          field: 'age' as const
-        }
-      ]
+      warnings.push({
+        code: 'age-ingredient-restriction',
+        message: rule.warning_text,
+        severity: 'critical',
+        field: 'age'
+      })
+      continue
     }
 
     if (rule.max_dosage_mg && signals.dosage?.value) {
       if (signals.dosage.value > rule.max_dosage_mg) {
-        return [
-          {
-            code: 'pediatric-dosage-exceeded',
-            message: rule.warning_text,
-            severity: 'warning' as const,
-            field: 'dosage' as const
-          }
-        ]
+        warnings.push({
+          code: 'pediatric-dosage-exceeded',
+          message: rule.warning_text,
+          severity: 'warning',
+          field: 'dosage'
+        })
       }
     }
-
-    return []
-  })
+  }
 
   return { warnings }
 }
