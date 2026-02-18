@@ -2,14 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { SearchAutocomplete } from '@/components/SearchAutocomplete'
 
 export function LandingSearch() {
   const router = useRouter()
   const [q, setQ] = useState('')
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault()
-    const query = q.trim()
+  function submit(nextQuery?: string) {
+    const query = (nextQuery ?? q).trim()
     if (!query) {
       router.push('/products')
       return
@@ -18,17 +18,24 @@ export function LandingSearch() {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col sm:flex-row gap-3" aria-label="Search products">
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        submit()
+      }}
+      className="flex flex-col sm:flex-row gap-3"
+      aria-label="Search products"
+    >
       <label htmlFor="landing-search" className="sr-only">
         Search products
       </label>
-      <input
+      <SearchAutocomplete
         id="landing-search"
-        type="text"
         value={q}
-        onChange={(e) => setQ(e.target.value)}
+        onChange={setQ}
+        onSubmit={submit}
         placeholder="Search products, brands, or categories…"
-        className="input flex-1"
+        ariaLabel="Search products"
       />
       <button type="submit" className="btn-primary px-5">
         Search

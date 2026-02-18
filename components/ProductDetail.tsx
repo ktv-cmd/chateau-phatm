@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Product } from '@/lib/types'
 import { supabaseClient } from '@/lib/db/supabaseClient'
@@ -8,12 +9,20 @@ import { addCartItem, getCartItemByProduct, updateCartItemQty } from '@/lib/db/c
 
 interface ProductDetailProps {
   product: Product
+  returnTo?: string | null
 }
 
-export function ProductDetail({ product }: ProductDetailProps) {
+const DEFAULT_DESCRIPTION = 'Quality healthcare product for home use.'
+
+export function ProductDetail({ product, returnTo }: ProductDetailProps) {
   const router = useRouter()
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
+  const backHref = returnTo && returnTo.startsWith('/') ? returnTo : '/products'
+  const descriptionText = product.description?.trim() || DEFAULT_DESCRIPTION
+  const titleText = product.base_product_name || product.name
+  const sizeBadgeText =
+    product.variant_size && product.variant_size.toLowerCase() !== 'standard' ? product.variant_size : null
 
   async function handleAddToCart() {
     setIsAdding(true)
@@ -42,44 +51,63 @@ export function ProductDetail({ product }: ProductDetailProps) {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
+        <div className="mb-4">
+          <Link
+            href={backHref}
+            className="inline-flex items-center text-sm text-gray-600 hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+          >
+            ← Back to results
+          </Link>
+        </div>
+
         <nav aria-label="Breadcrumb" className="mb-4">
           <ol className="flex space-x-2 text-sm text-gray-600">
-            <li><a href="/products" className="hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">Products</a></li>
+            <li><Link href={backHref} className="hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">Products</Link></li>
             <li aria-hidden="true">/</li>
-            <li className="text-gray-900">{product.name}</li>
+            <li className="text-gray-900">{titleText}</li>
           </ol>
         </nav>
 
         <div className="grid md:grid-cols-2 gap-8">
           <div>
             {product.image_url ? (
-              <img
-                src={product.image_url}
-                alt={`${product.name} - ${product.category}${product.brand ? ` by ${product.brand}` : ''}`}
-                className="w-full h-96 object-cover rounded-lg"
-                loading="lazy"
-              />
+              <div className="group w-full h-96 rounded-lg bg-white overflow-hidden relative">
+                {sizeBadgeText ? (
+                  <span className="absolute top-3 right-3 z-10 rounded-full bg-gray-900/80 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur">
+                    {sizeBadgeText}
+                  </span>
+                ) : null}
+                <img
+                  src={product.image_url}
+                  alt={`${titleText}${sizeBadgeText ? ` (${sizeBadgeText})` : ''} - ${product.category}${product.brand ? ` by ${product.brand}` : ''}`}
+                  className="w-full h-full object-contain transition-transform duration-300 ease-out group-hover:scale-125 group-hover:cursor-zoom-in"
+                  loading="lazy"
+                />
+              </div>
             ) : (
-              <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center" role="img" aria-label={`No image available for ${product.name}`}>
-                <span className="sr-only">No image available for {product.name}</span>
+              <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center relative" role="img" aria-label={`No image available for ${product.name}`}>
+                {sizeBadgeText ? (
+                  <span className="absolute top-3 right-3 z-10 rounded-full bg-gray-900/80 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur">
+                    {sizeBadgeText}
+                  </span>
+                ) : null}
+                <span className="sr-only">No image available for {titleText}</span>
               </div>
             )}
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
+            <h1 className="text-3xl font-bold mb-4">{titleText}</h1>
             <p className="text-lg text-gray-600 mb-2">{product.category}</p>
             {product.brand && (
               <p className="text-sm text-gray-500 mb-4">Brand: {product.brand}</p>
             )}
             <p className="text-3xl font-bold text-primary-600 mb-6">{product.price_display}</p>
 
-            {product.description && (
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-2">Description</h2>
-                <p className="text-gray-700">{product.description}</p>
-              </div>
-            )}
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold mb-2">Description</h2>
+              <p className="text-gray-700">{descriptionText}</p>
+            </div>
 
             {product.in_stock ? (
               <div className="space-y-4">

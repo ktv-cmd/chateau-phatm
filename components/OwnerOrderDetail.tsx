@@ -37,7 +37,7 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
       return
     }
 
-    router.refresh()
+      router.refresh()
     setIsUpdating(false)
   }
 

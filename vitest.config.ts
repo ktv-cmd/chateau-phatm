@@ -9,6 +9,13 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['tests/unit/**/*.test.ts']
+    include: [
+      'tests/unit/**/*.test.ts',
+      'tests/api/**/*.test.ts',
+      'tests/components/**/*.test.tsx',
+      'tests/components/**/*.test.ts'
+    ],
+    environmentMatchGlobs: [['tests/components/**', 'jsdom']],
+    setupFiles: ['tests/setup.ts']
   }
 })

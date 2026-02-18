@@ -1,0 +1,207 @@
+{
+  "timestamp": "2026-02-17T21:08:24.454Z",
+  "mode": "live",
+  "summary": {
+    "total_scanned": 42,
+    "mismatches": 24,
+    "replaced": 2,
+    "ocr_failures": 0,
+    "broken_urls": 0,
+    "duplicate_image_groups": 0
+  },
+  "changes": [
+    {
+      "product_id": "2a9deb2f-efa2-43f0-b1fd-1065b242b5f9",
+      "product_name": "ADVANCED EYE RELIEF DR 0.2% 3.5ML",
+      "old_image_url": "https://i5.walmartimages.com/seo/Glenmark-Therapeutics-Daily-Olopatadine-Eye-Drops-Allergies-Redness-Relief-Antihistamine-Allergy-Relief-Pet-Dander-Pollen-Grass-Ragweed-Olopatadine-H_071ab63b-34c0-447e-a61a-739e02120c5f.a0383e9bee325a98983422504cc5ab12.jpeg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"ADVANCED\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "7cffaa28-a2e5-47b7-93e7-ab0a08f67c5f",
+      "product_name": "CHLORHEXIDINE GLUC LQ 4% 118ML",
+      "old_image_url": "/product-images/chlorhexidine-gluc-liquid-4pct-118ml.png",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"CHLORHEXIDINE\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "a80a1a2e-60ed-4290-b510-25fe6943b12c",
+      "product_name": "CHLORHEXIDINE GLUC LQ 4% 236ML",
+      "old_image_url": "https://m.media-amazon.com/images/I/71OOPFWvW0L.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"CHLORHEXIDINE\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "535e5bb0-5158-42c3-a5ea-c62bb5448741",
+      "product_name": "CLEARCANAL DR 6.5% ERWX/RMV AD",
+      "old_image_url": "/product-images/clearcanal-6-5pct-erwx-r.png",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"CLEARCANAL\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "9898b43f-2f9b-4724-9114-490e056d9806",
+      "product_name": "DOVE WHOLE BODY CR 2.5OZ 73ML",
+      "old_image_url": "/product-images/dove-whole-body-cream-2-5oz-73ml.png",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"DOVE\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "3aef2fc6-6f20-4900-8720-9df76f96c4dc",
+      "product_name": "DRIPDROP PK 8X10GM BOLD VRTY",
+      "old_image_url": "https://m.media-amazon.com/images/I/81daTjWX30L.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"DRIPDROP\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "69db44ff-9f24-46fc-981a-33635a81ec66",
+      "product_name": "DRIPDROP PK 8X10GM JUICY VRTY",
+      "old_image_url": "https://m.media-amazon.com/images/I/71Fp+S0tkAL.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"DRIPDROP\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "1ffa8a27-59a7-493e-a4b6-50b935a7187d",
+      "product_name": "EXCEDRIN ES TB 250-250-65MG 100",
+      "old_image_url": "https://m.media-amazon.com/images/I/71gNwFI-TAL._AC_UL320_.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"EXCEDRIN\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "8d53e642-0fd5-4478-8b14-5ed9e6ce48f5",
+      "product_name": "FASTEP COVID-19 ANTIGEN HOME KT",
+      "old_image_url": "https://m.media-amazon.com/images/I/61cfYwteULL._AC_SX208_CB1169409_QL70_.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"FASTEP\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "c9606566-02c8-4797-b919-c6fe493e7dd8",
+      "product_name": "FASTEP COVID-19 ANTIGEN HOME KT 2",
+      "old_image_url": "https://m.media-amazon.com/images/I/61cfYwteULL._AC_SX208_CB1169409_QL70_.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"FASTEP\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "53a70c46-ddc1-4167-ad70-d65e3170c716",
+      "product_name": "GERI-DRYL A/R LQ 12.5MG/5ML 473ML",
+      "old_image_url": "https://m.media-amazon.com/images/I/41-uCnGhUsL.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"GERI\" not found in image text; Form mismatch: expected \"liquid\", image shows \"tablet\"",
+      "status": "flagged"
+    },
+    {
+      "product_id": "8f930487-28d0-4a51-be6c-d22d0f118e80",
+      "product_name": "HIBICLENS A/SKN CLNS SL 4% 236ML",
+      "old_image_url": "https://m.media-amazon.com/images/I/81xigJfA6sL.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"HIBICLENS\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "9f22384e-7fb8-4364-a304-d41ebc1ff770",
+      "product_name": "LDR MENS EXTRA STRENGTH SL 180ML",
+      "old_image_url": "https://m.media-amazon.com/images/I/81X2WVbLtAL.jpg",
+      "new_image_url": null,
+      "reason": "Form mismatch: expected \"solution\", image shows \"capsule\"",
+      "status": "flagged"
+    },
+    {
+      "product_id": "d88af10a-41a7-4fe2-87cd-d4c956831b32",
+      "product_name": "OMRON BLOOD PRESSURE 3 SER U/R",
+      "old_image_url": "https://m.media-amazon.com/images/I/71KKdwuHTgL.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"OMRON\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "90c7cfbc-25de-4112-9796-fe5b8ce7bf56",
+      "product_name": "OMRON BLOOD PRESSURE 5 SER U/R",
+      "old_image_url": "https://m.media-amazon.com/images/I/71KKdwuHTgL.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"OMRON\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "2f05dea5-216f-4a43-9cc2-4c1ed209afba",
+      "product_name": "ORACOAT XYLIMELTS LZ 80 MILD MINT",
+      "old_image_url": "https://m.media-amazon.com/images/I/71+RiaRCiDL._AC_UL320_.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"ORACOAT\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "94fe5a65-38c6-4841-89d9-bc456c5af252",
+      "product_name": "POLIDENT DENTURE CLEANSER TB 30",
+      "old_image_url": "https://m.media-amazon.com/images/I/81VTZYQOARL.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"POLIDENT\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "ed1715fa-e26c-4563-8add-174b43beb721",
+      "product_name": "POLIDENT DENTURE CLEANSER TB 90",
+      "old_image_url": "https://m.media-amazon.com/images/I/81VTZYQOARL.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"POLIDENT\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "a05f50c8-1bfe-496c-9502-3e87786a6017",
+      "product_name": "REMEDY SPECIALIZED OI 15-49% 113",
+      "old_image_url": "https://m.media-amazon.com/images/I/71DqB+fnZgL.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"REMEDY\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "c9e6fdef-3457-4e22-a5e5-8cfa7ccc7942",
+      "product_name": "ROLAIDS ULTRA STRNTH CW 10 AS FRT",
+      "old_image_url": "https://m.media-amazon.com/images/I/71ey+SfbTbL.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"ROLAIDS\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "cf170cee-b8d0-4173-a9e1-8c814ae4b378",
+      "product_name": "SECRET WHOLE BDY DEO CR 3OZ PC+VN",
+      "old_image_url": "https://m.media-amazon.com/images/I/51L1a4u7LnL.jpg",
+      "new_image_url": "https://m.media-amazon.com/images/I/71+bxoEMXrL._AC_UL320_.jpg",
+      "reason": "Brand mismatch: expected \"SECRET\" not found in image text; Form mismatch: expected \"cream\", image shows \"capsule\"",
+      "status": "replaced"
+    },
+    {
+      "product_id": "2eb1e68d-215b-4cb2-84fa-01efeacbf5ac",
+      "product_name": "SUNBUM LT 3-10-5-3.75% 170GMSPF30",
+      "old_image_url": "https://m.media-amazon.com/images/I/61mwDN21jGL.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"SUNBUM\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "8cf8ae20-aea2-493a-9540-797a2b347630",
+      "product_name": "TYLENOL ES E2S GC 500MG 100 CPLT",
+      "old_image_url": "https://m.media-amazon.com/images/I/71zBkMgRknL._AC_UL320_.jpg",
+      "new_image_url": null,
+      "reason": "Brand mismatch: expected \"TYLENOL\" not found in image text; auto-replace skipped (brand-only rule)",
+      "status": "flagged"
+    },
+    {
+      "product_id": "706d400e-6e0a-45e8-b823-45acb1076894",
+      "product_name": "ZYRTEC TB 10MG 30+10 BNS 24HR",
+      "old_image_url": "https://m.media-amazon.com/images/I/71EQVX9ccLL._AC_UL320_.jpg",
+      "new_image_url": "https://m.media-amazon.com/images/I/715KWrUrw6L._AC_UL320_.jpg",
+      "reason": "Count mismatch: expected 30, image shows 45",
+      "status": "replaced"
+    }
+  ],
+  "duplicate_issues": []
+}

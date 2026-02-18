@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-02-18T20:04:00.299Z",
+  "dry_run": false,
+  "total": 20,
+  "updated": 4,
+  "skipped": 3,
+  "missing": 13,
+  "failed": 0,
+  "errors": []
+}

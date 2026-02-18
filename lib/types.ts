@@ -40,8 +40,14 @@ export interface Product {
   is_active?: boolean
   is_featured?: boolean
   sku: string | null
+  base_product_name?: string | null
+  variant_size?: string | null
   created_at: string
   updated_at: string
+}
+
+export interface ProductWithVariants extends Product {
+  variants?: Product[]
 }
 
 export interface ProductImage {

@@ -198,30 +198,5 @@
     "margin_bucket": "B",
     "popularity_score": 35,
     "internal_cost_cents": 250
-  },
-  {
-    "id": "ammonium-lactate-lotion-12-ff-79oz",
-    "name": "Ammonium Lactate Lotion 12% (Fragrance Free)",
-    "brand": "AmLactin",
-    "category": "Skin Care & Topicals",
-    "description": "Ammonium lactate 12% lotion for dry, rough skin. Fragrance-free. Form: lotion. Size: 7.9 oz (225 g).",
-    "image_url": "/product-images/ammonium-lactate-lotion-12-ff-7-9oz.png",
-    "price_display": "Call for Price",
-    "in_stock": true,
-    "sku": "AMLAC-12-FF-7.9OZ",
-    "base_product_name": "Ammonium Lactate Lotion 12% (Fragrance Free)",
-    "variant_size": "7.9 oz",
-    "active_ingredients": ["ammonium lactate"],
-    "symptom_tags": ["dry skin", "rough skin"],
-    "form": "lotion",
-    "dosage_value": 12,
-    "dosage_unit": "%",
-    "pack_count": 1,
-    "age_group": "adult",
-    "rating_avg": 4.6,
-    "rating_count": 12,
-    "margin_bucket": "B",
-    "popularity_score": 40,
-    "internal_cost_cents": 0
   }
 ]

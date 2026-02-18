@@ -283,7 +283,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                       <div className="w-full h-48 rounded bg-white overflow-hidden relative">
                         <img
                           src={selectedVariant.image_url}
-                          alt={`${baseName}${sizeBadgeText ? ` (${sizeBadgeText})` : ''} - ${selectedVariant.category}`}
+                          alt={`${baseName}${!hasMultipleVariants && sizeBadgeText ? ` (${sizeBadgeText})` : ''} - ${selectedVariant.category}`}
                           className="w-full h-full object-contain transition-transform duration-300 ease-out group-hover:scale-110 group-hover:cursor-zoom-in"
                           loading="lazy"
                         />
@@ -337,16 +337,18 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                         ))}
                       </select>
                     </>
+                  ) : sizeBadgeText ? (
+                    <span
+                      className="ml-auto rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-800"
+                      aria-label={`Size ${sizeBadgeText}`}
+                    >
+                      {sizeBadgeText}
+                    </span>
                   ) : null}
                 </div>
 
               {/* Quick add controls (Instacart-style) */}
-                <div className="min-h-[44px] relative">
-                  {sizeBadgeText ? (
-                    <span className="absolute -top-3 right-0 z-10 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-800 shadow-sm">
-                      {sizeBadgeText}
-                    </span>
-                  ) : null}
+                <div className="min-h-[44px]">
                   {selectedVariant.in_stock ? (
                     cartByProduct[selectedVariant.id] ? (
                       <div className="flex items-center justify-between gap-3">

@@ -7,9 +7,10 @@ import { ProductDetail } from '@/components/ProductDetail'
 
 interface ProductPageProps {
   params: { id: string }
+  searchParams?: { returnTo?: string }
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({ params, searchParams }: ProductPageProps) {
   const user = await getCurrentUser()
   if (!user) {
     redirect('/login')
@@ -27,5 +28,5 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound()
   }
 
-  return <ProductDetail product={product} />
+  return <ProductDetail product={product} returnTo={searchParams?.returnTo} />
 }

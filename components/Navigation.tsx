@@ -146,8 +146,8 @@ export function Navigation() {
                   alt="Chateau Drug & Homecare logo"
                   className="h-8 w-auto"
                 />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">
-                  Chateau Pharmacy
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">
+                Chateau Pharmacy
                 </span>
               </span>
             </Link>
