@@ -2,7 +2,7 @@ import { searchMeili, MeilisearchUnavailableError } from '@/lib/search/meilisear
 import { parseQuery } from '@/lib/search/parseQuery'
 import { rankProducts } from '@/lib/search/rank'
 import { fixtureProducts } from '@/lib/search/fixtures'
-import { SearchFilters, SearchOptions, SearchResponse, SearchResultItem, SearchSuggestion, SearchSafety } from '@/lib/search/types'
+import { SearchFilters, SearchOptions, SearchResponse, SearchResultItem, SearchSuggestion, SearchSafety, SearchSafetyWarning } from '@/lib/search/types'
 import { normalizeQuery } from '@/lib/search/normalizeQuery'
 import { SYMPTOM_MAP, expandSynonyms } from '@/lib/search/synonyms'
 import { SAFETY_RULES } from '@/lib/search/safetyRules'
@@ -118,7 +118,7 @@ function buildSuggestions(items: SearchResultItem[], query: string): SearchSugge
 }
 
 function buildSafety(signals: ReturnType<typeof parseQuery>): SearchSafety {
-  const warnings = SAFETY_RULES.flatMap((rule) => {
+  const warnings = SAFETY_RULES.flatMap((rule): SearchSafetyWarning[] => {
     if (!signals.ageIntent || rule.age_group !== signals.ageIntent) return []
     if (!signals.detectedIngredients.includes(rule.ingredient)) return []
 
