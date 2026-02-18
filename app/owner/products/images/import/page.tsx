@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation'
-import { getServerUser } from '@/lib/auth-server'
+import { getCurrentUser } from '@/lib/auth-server'
 import ProductImageCsvImport from '@/components/ProductImageCsvImport'
 
 export default async function ProductImageImportPage() {
-  const user = await getServerUser()
+  const user = await getCurrentUser()
 
   if (!user || user.email !== 'admin@chateau-demo.com') {
     redirect('/login')

@@ -1,16 +1,16 @@
 import { redirect } from 'next/navigation'
-import { getServerUser } from '@/lib/auth-server'
-import { createServerClient } from '@/lib/db/supabaseServerClient'
+import { getCurrentUser } from '@/lib/auth-server'
+import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
 import ProductImageManager from '@/components/ProductImageManager'
 
 export default async function ProductImagesPage() {
-  const user = await getServerUser()
+  const user = await getCurrentUser()
   
   if (!user || user.email !== 'admin@chateau-demo.com') {
     redirect('/login')
   }
   
-  const supabase = createServerClient()
+  const supabase = await supabaseServerClient()
   
   // Get all products
   const { data: products } = await supabase
