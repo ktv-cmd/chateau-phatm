@@ -1,118 +1,65 @@
-import dotenv from 'dotenv'
+import * as dotenv from 'dotenv'
+import * as path from 'path'
 import { createClient } from '@supabase/supabase-js'
 
-dotenv.config({ path: '.env.local' })
+dotenv.config({ path: path.join(process.cwd(), '.env.local') })
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-if (!supabaseUrl || !serviceKey) {
-  console.error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('❌ Missing required environment variables!')
+  console.error('Required: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY')
   process.exit(1)
 }
 
-const supabase = createClient(supabaseUrl, serviceKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: { autoRefreshToken: false, persistSession: false }
 })
 
-function parseCentsFromDisplay(value?: string) {
-  if (!value) return null
-  const normalized = value.replace(/[^0-9.]/g, '')
-  if (!normalized) return null
-  const num = Number.parseFloat(normalized)
-  if (Number.isNaN(num)) return null
-  return Math.round(num * 100)
-}
-
-async function ensureVariant(params: {
-  base: string
-  variantSize: string
-  sku?: string | null
-  imageUrl?: string | null
-  priceDisplay?: string
-}) {
-  const name = `${params.base} (${params.variantSize})`
-  const priceCents =
-    params.priceDisplay && params.priceDisplay.toLowerCase().includes('call') ? null : parseCentsFromDisplay(params.priceDisplay)
-
-  const lookup = await supabase
-    .from('products')
-    .select('id, sku, name')
-    .eq('base_product_name', params.base)
-    .eq('variant_size', params.variantSize)
-    .limit(1)
-
-  if (lookup.error) throw lookup.error
-
-  if (lookup.data && lookup.data.length) {
-    const id = lookup.data[0].id
-    const { error } = await supabase
-      .from('products')
-      .update({
-        name,
-        brand: 'Perrigo',
-        category: 'Over-the-Counter',
-        ...(params.sku ? { sku: params.sku } : {}),
-        ...(params.imageUrl ? { image_url: params.imageUrl } : {}),
-        ...(params.priceDisplay ? { price_display: params.priceDisplay } : {}),
-        ...(typeof priceCents === 'number' ? { price_cents: priceCents } : {}),
-        is_active: true,
-      })
-      .eq('id', id)
-    if (error) throw error
-    return { action: 'updated', id, name }
-  }
-
-  const insert = await supabase
-    .from('products')
-    .insert({
-      name,
-      base_product_name: params.base,
-      variant_size: params.variantSize,
-      brand: 'Perrigo',
-      category: 'Over-the-Counter',
-      description:
-        'Fragrance-free ammonium lactate lotion 12% for moisturizing and softening dry, scaly skin.',
-      image_url: params.imageUrl || null,
-      sku: params.sku || null,
-      price_display: params.priceDisplay || 'Call for Price',
-      price_cents: typeof priceCents === 'number' ? priceCents : null,
-      in_stock: true,
-      is_active: true,
-    })
-    .select('id, name')
-    .single()
-
-  if (insert.error) throw insert.error
-  return { action: 'inserted', id: insert.data.id, name: insert.data.name }
+const product = {
+  name: 'Ammonium Lactate Lotion 12% (Fragrance Free) (7.9 oz)',
+  base_product_name: 'Ammonium Lactate Lotion 12% (Fragrance Free)',
+  variant_size: '7.9 oz',
+  brand: 'AmLactin',
+  category: 'Skin Care & Topicals',
+  description:
+    'Ammonium lactate 12% lotion for dry, rough skin. Fragrance-free. Helps exfoliate and hydrate.',
+  image_url: '/product-images/ammonium-lactate-lotion-12-ff-7-9oz.png',
+  price_display: 'Call for Price',
+  in_stock: true,
+  is_active: true,
+  sku: 'AMLAC-12-FF-7.9OZ'
 }
 
 async function run() {
-  const base = 'Ammonium Lactate Lotion 12% Fragrance Free'
+  const { data: existingBySku, error: lookupError } = await supabase
+    .from('products')
+    .select('id,name,sku')
+    .eq('sku', product.sku)
+    .maybeSingle()
 
-  // Existing SKU in your DB for the 225 g size
-  const v225 = await ensureVariant({
-    base,
-    variantSize: '225 g',
-    sku: '5940366',
-    priceDisplay: '$11.89',
-  })
+  if (lookupError) {
+    console.error('❌ Lookup failed:', lookupError)
+    process.exit(1)
+  }
 
-  // New 14 oz / 400 g variant (image added to public/)
-  const v14oz = await ensureVariant({
-    base,
-    variantSize: '14 oz / 400 g',
-    imageUrl: '/product-images/ammonium-lactate-lotion-12-fragrance-free-14oz.png',
-    priceDisplay: '$11.89',
-  })
+  if (existingBySku?.id) {
+    const { error: updateError } = await supabase.from('products').update(product).eq('id', existingBySku.id)
+    if (updateError) {
+      console.error('❌ Update failed:', updateError)
+      process.exit(1)
+    }
+    console.log(`✅ Updated: ${existingBySku.name} (sku: ${product.sku})`)
+    return
+  }
 
-  console.log('✅ Done')
-  console.log('-', v225.action, v225.name)
-  console.log('-', v14oz.action, v14oz.name)
+  const { error: insertError } = await supabase.from('products').insert(product)
+  if (insertError) {
+    console.error('❌ Insert failed:', insertError)
+    process.exit(1)
+  }
+  console.log(`✅ Inserted: ${product.name} (sku: ${product.sku})`)
 }
 
-run().catch((err) => {
-  console.error('❌ Upsert failed:', err)
-  process.exit(1)
-})
-
+run()
