@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { Order } from '@/lib/types'
+import { Order, OrderWithItems } from '@/lib/types'
+import { computeOrderTotal } from '@/lib/utils'
 
 interface OrdersListProps {
-  orders: Order[]
+  orders: OrderWithItems[]
   isOwner: boolean
 }
 
@@ -65,7 +66,12 @@ export function OrdersList({ orders, isOwner }: OrdersListProps) {
                 </div>
                 {getStatusBadge(order.status)}
               </div>
-              <p className="text-gray-700">Total Items: {order.total_items}</p>
+              <div className="flex items-center gap-4 mt-1">
+                <p className="text-gray-700">Items: {order.total_items}</p>
+                <p className="font-semibold text-primary-700">
+                  Total: {computeOrderTotal(order.order_items || [])}
+                </p>
+              </div>
               {order.sheet_sync_failed && (
                 <p className="text-sm text-red-600 mt-2">
                   ⚠️ Failed to sync to Google Sheets

@@ -106,3 +106,7 @@ export interface OrderItem {
   created_at: string
   product?: Product
 }
+
+export interface OrderWithItems extends Order {
+  order_items?: OrderItem[]
+}

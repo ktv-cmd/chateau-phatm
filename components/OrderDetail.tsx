@@ -1,6 +1,7 @@
 'use client'
 
 import { Order, OrderItem } from '@/lib/types'
+import { computeOrderTotal } from '@/lib/utils'
 
 interface OrderDetailProps {
   order: Order
@@ -124,9 +125,15 @@ export function OrderDetail({ order, orderItems, showSuccess }: OrderDetailProps
                 ))}
               </tbody>
               <tfoot>
-                <tr>
+                <tr className="border-t">
                   <td colSpan={2} className="font-semibold py-2 px-4">Total Items:</td>
                   <td className="text-right font-semibold py-2 px-4">{order.total_items}</td>
+                </tr>
+                <tr className="border-t">
+                  <td colSpan={2} className="font-semibold py-2 px-4">Order Total:</td>
+                  <td className="text-right font-semibold py-2 px-4 text-primary-700">
+                    {computeOrderTotal(orderItems)}
+                  </td>
                 </tr>
               </tfoot>
             </table>

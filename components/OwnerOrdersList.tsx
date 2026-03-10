@@ -2,10 +2,11 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Order } from '@/lib/types'
+import { Order, OrderWithItems } from '@/lib/types'
+import { computeOrderTotal } from '@/lib/utils'
 
 interface OwnerOrdersListProps {
-  orders: Order[]
+  orders: OrderWithItems[]
   selectedStatus?: string
 }
 
@@ -80,6 +81,7 @@ export function OwnerOrdersList({ orders, selectedStatus }: OwnerOrdersListProps
                   <th scope="col" className="text-left py-3 px-4">Date</th>
                   <th scope="col" className="text-left py-3 px-4">Status</th>
                   <th scope="col" className="text-right py-3 px-4">Items</th>
+                  <th scope="col" className="text-right py-3 px-4">Total</th>
                   <th scope="col" className="text-left py-3 px-4">Actions</th>
                 </tr>
               </thead>
@@ -105,6 +107,9 @@ export function OwnerOrdersList({ orders, selectedStatus }: OwnerOrdersListProps
                     </td>
                     <td className="py-3 px-4">{getStatusBadge(order.status)}</td>
                     <td className="text-right py-3 px-4">{order.total_items}</td>
+                    <td className="text-right py-3 px-4 font-medium text-primary-700">
+                      {computeOrderTotal(order.order_items || [])}
+                    </td>
                     <td className="py-3 px-4">
                       <Link
                         href={`/owner/orders/${order.id}`}

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Order, OrderItem } from '@/lib/types'
+import { computeOrderTotal } from '@/lib/utils'
 
 interface OwnerOrderDetailProps {
   order: Order
@@ -58,17 +59,44 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-primary-700 mb-6"
-        >
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to orders
-        </button>
-        <h1 className="text-3xl font-bold mb-8">Order Details</h1>
+
+        {/* Top navigation — hidden when printing */}
+        <div className="flex items-center justify-between mb-6 print:hidden">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-primary-700"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to orders
+          </button>
+
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+            aria-label="Print order"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 14h12v8H6z" />
+            </svg>
+            Print Order
+          </button>
+        </div>
+
+        {/* Print-only header */}
+        <div className="hidden print:block mb-6 pb-4 border-b-2 border-gray-800">
+          <p className="text-sm text-gray-500 mb-1">Order Receipt</p>
+          <h1 className="text-2xl font-bold">Order #{order.id.slice(0, 8)}</h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Printed on {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
+
+        <h1 className="text-3xl font-bold mb-8 print:hidden">Order Details</h1>
 
         <div className="card mb-6">
           <div className="flex justify-between items-start mb-4">
@@ -88,7 +116,7 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
             {getStatusBadge(order.status)}
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4 print:hidden">
             <label htmlFor="status-select" className="label">Update Status</label>
             <div className="flex gap-4">
               <select
@@ -175,9 +203,15 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
                 ))}
               </tbody>
               <tfoot>
-                <tr>
+                <tr className="border-t">
                   <td colSpan={2} className="font-semibold py-2 px-4">Total Items:</td>
                   <td className="text-right font-semibold py-2 px-4">{order.total_items}</td>
+                </tr>
+                <tr className="border-t">
+                  <td colSpan={2} className="font-semibold py-2 px-4">Order Total:</td>
+                  <td className="text-right font-semibold py-2 px-4 text-primary-700">
+                    {computeOrderTotal(orderItems)}
+                  </td>
                 </tr>
               </tfoot>
             </table>

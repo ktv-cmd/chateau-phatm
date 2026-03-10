@@ -1,23 +1,23 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { Order, OrderItem } from '@/lib/types'
+import { Order, OrderItem, OrderWithItems } from '@/lib/types'
 
 export async function listOrdersForUser(supabase: SupabaseClient, userId: string) {
   const { data, error } = await supabase
     .from('orders')
-    .select('*')
+    .select('*, order_items(*)')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
-  return { data: (data as Order[]) || [], error }
+  return { data: (data as OrderWithItems[]) || [], error }
 }
 
 export async function listOrders(supabase: SupabaseClient, status?: string) {
-  let query = supabase.from('orders').select('*').order('created_at', { ascending: false })
+  let query = supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false })
   if (status) {
     query = query.eq('status', status)
   }
   const { data, error } = await query
-  return { data: (data as Order[]) || [], error }
+  return { data: (data as OrderWithItems[]) || [], error }
 }
 
 export async function getOrderById(supabase: SupabaseClient, id: string) {
