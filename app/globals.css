@@ -167,6 +167,24 @@
     print-color-adjust: exact;
   }
 
+  /* Hide all chrome: top nav, footer, mobile bottom nav */
+  nav,
+  footer,
+  [role="navigation"],
+  [role="contentinfo"] {
+    display: none !important;
+  }
+
+  /* Remove the padding-bottom added for mobile nav */
+  main {
+    padding-bottom: 0 !important;
+  }
+
+  /* Remove full-screen height constraint so content fits naturally */
+  .min-h-screen {
+    min-height: 0 !important;
+  }
+
   .card {
     background: white !important;
     -webkit-backdrop-filter: none !important;
