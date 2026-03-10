@@ -159,6 +159,33 @@
   white-space: normal;
 }
 
+/* ─── Print styles ──────────────────────────────────────────────── */
+@media print {
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .card {
+    background: white !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    break-inside: avoid;
+  }
+
+  table {
+    break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+}
+
 /* Ensure sufficient color contrast for text */
 .text-gray-600 {
   color: #4b5563; /* Contrast ratio: 7:1 on white */
