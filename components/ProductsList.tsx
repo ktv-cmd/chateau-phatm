@@ -7,9 +7,6 @@ import { Product, ProductWithVariants } from '@/lib/types'
 import { supabaseClient } from '@/lib/db/supabaseClient'
 import { addCartItem, deleteCartItem, getCartSummary, updateCartItemQty } from '@/lib/db/cart'
 import { logger } from '@/lib/logger'
-import { SearchAutocomplete } from '@/components/SearchAutocomplete'
-import { SafetyBanner } from '@/components/SafetyBanner'
-import { SearchSafetyWarning } from '@/lib/search/types'
 
 const DEFAULT_DESCRIPTION = 'Quality healthcare product for home use.'
 
@@ -57,16 +54,15 @@ function groupProductVariants(products: Product[]): ProductWithVariants[] {
   return Object.values(groups)
 }
 
-export function ProductsList({ products, categories, selectedCategory, searchQuery }: ProductsListProps) {
+export function ProductsList({ products, categories, selectedCategory, searchQuery: _searchQuery }: ProductsListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [search, setSearch] = useState(searchQuery || '')
   const [isUpdating, setIsUpdating] = useState<string | null>(null)
   const [cartByProduct, setCartByProduct] = useState<Record<string, { id: string; qty: number }>>({})
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
-  const [safetyWarnings, setSafetyWarnings] = useState<SearchSafetyWarning[]>([])
   // Group products by variants
   const groupedProducts = useMemo(() => groupProductVariants(products), [products])
+  const isSearchMode = Boolean(searchParams?.get('search'))
 
   useEffect(() => {
     loadCart()
@@ -108,7 +104,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
     const { data: { user } } = await supabaseClient.auth.getUser()
     if (!user) {
       setIsUpdating(null)
-      router.push('/login')
+      router.push(`/login?redirectedFrom=/products`)
       return
     }
 
@@ -139,7 +135,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
     const { data: { user } } = await supabaseClient.auth.getUser()
     if (!user) {
       setIsUpdating(null)
-      router.push('/login')
+      router.push(`/login?redirectedFrom=/products`)
       return
     }
 
@@ -165,18 +161,6 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
     setIsUpdating(null)
   }
 
-  function handleSearch(nextQuery?: string, event?: React.FormEvent) {
-    event?.preventDefault()
-    const params = new URLSearchParams(searchParams.toString())
-    const query = (nextQuery ?? search).trim()
-    if (query) {
-      params.set('search', query)
-    } else {
-      params.delete('search')
-    }
-    router.push(`/products?${params.toString()}`)
-  }
-
   function handleCategoryChange(category: string) {
     const params = new URLSearchParams(searchParams.toString())
     if (category) {
@@ -195,24 +179,8 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
 
   return (
     <div>
-      {/* Search and Filters */}
+      {/* Filters */}
       <div className="mb-6 space-y-4">
-        <form onSubmit={(event) => handleSearch(undefined, event)} className="flex flex-col sm:flex-row gap-3">
-          <label htmlFor="search" className="sr-only">Search products</label>
-          <SearchAutocomplete
-            id="search"
-            value={search}
-            onChange={setSearch}
-            onSubmit={handleSearch}
-            onSafety={setSafetyWarnings}
-            placeholder="Search products..."
-            ariaLabel="Search products"
-          />
-          <button type="submit" className="btn-primary px-5">Search</button>
-        </form>
-
-        <SafetyBanner warnings={safetyWarnings} />
-
         <div className="flex items-center justify-between gap-3">
           <label htmlFor="category-filter" className="label mb-0">Category</label>
           <select
@@ -253,7 +221,13 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div
+          className={
+            isSearchMode
+              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6'
+              : 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6'
+          }
+        >
           {groupedProducts.map((productGroup) => {
             const baseName = productGroup.base_product_name || productGroup.name
             const variants = productGroup.variants?.length ? productGroup.variants : [productGroup]
@@ -269,51 +243,73 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
             return (
               <article
                 key={selectedVariant.id}
-                className="card group hover:shadow-lg transition-shadow flex flex-col h-full"
+                className="card group hover:shadow-lg transition-shadow flex flex-col h-full p-4 sm:p-6"
               >
                 <Link
                   href={`/products/${selectedVariant.id}?returnTo=${encodeURIComponent(returnTo)}`}
-                  className="block mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-1"
+                  className={
+                    isSearchMode
+                      ? 'block mb-3 sm:mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-1'
+                      : 'block mb-3 sm:mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-1'
+                  }
                 >
-                  <div className="flex flex-col gap-2">
-                    <h2 className="text-xl font-semibold line-clamp-2 leading-6 h-12">
-                      {titleText}
-                    </h2>
-                    {selectedVariant.image_url ? (
-                      <div className="w-full h-48 rounded bg-white overflow-hidden relative">
+                  <div className={isSearchMode ? 'flex gap-3 sm:flex-col sm:gap-2' : 'flex flex-col gap-2'}>
+                    <div
+                      className={
+                        isSearchMode
+                          ? 'w-5/12 sm:w-full aspect-square sm:aspect-auto sm:h-48 rounded bg-white overflow-hidden relative'
+                          : 'w-full aspect-square sm:aspect-auto sm:h-48 rounded bg-white overflow-hidden relative'
+                      }
+                      aria-hidden={selectedVariant.image_url ? undefined : 'true'}
+                      role={selectedVariant.image_url ? undefined : 'img'}
+                      aria-label={
+                        selectedVariant.image_url ? undefined : `No image available for ${selectedVariant.name}`
+                      }
+                    >
+                      {selectedVariant.image_url ? (
                         <img
                           src={selectedVariant.image_url}
                           alt={`${baseName}${!hasMultipleVariants && sizeBadgeText ? ` (${sizeBadgeText})` : ''} - ${selectedVariant.category}`}
                           className="w-full h-full object-contain transition-transform duration-300 ease-out group-hover:scale-110 group-hover:cursor-zoom-in"
                           loading="lazy"
                         />
-                      </div>
-                    ) : (
-                      <div
-                        className="w-full h-48 bg-gray-200 rounded flex items-center justify-center relative"
-                        aria-hidden="true"
-                        role="img"
-                        aria-label={`No image available for ${selectedVariant.name}`}
-                      >
-                        <span className="text-gray-400 sr-only">No image available</span>
-                      </div>
-                    )}
-                    <p className="text-sm text-gray-600 truncate leading-5 h-5">{selectedVariant.category}</p>
-                  <p className="text-sm text-gray-500 line-clamp-2 leading-5 h-10">{detailText}</p>
-                    <p className="text-sm leading-5 h-5">
-                      {selectedVariant.in_stock ? (
-                        <span className="text-transparent" aria-hidden="true">In stock</span>
                       ) : (
-                        <span className="text-red-600">Out of Stock</span>
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                          <span className="text-gray-400 sr-only">No image available</span>
+                        </div>
                       )}
-                    </p>
+                    </div>
+                    <div className={isSearchMode ? 'w-7/12 sm:w-full flex flex-col gap-2' : 'flex flex-col gap-2'}>
+                      <h2 className="text-base sm:text-xl font-semibold line-clamp-2 leading-5 sm:leading-6 min-h-[2.5rem] sm:h-12">
+                        {titleText}
+                      </h2>
+                      <p
+                        className={
+                          isSearchMode
+                            ? 'text-xs sm:text-sm text-gray-600 leading-4 sm:leading-5 line-clamp-1 sm:truncate sm:h-5'
+                            : 'text-xs sm:text-sm text-gray-600 truncate leading-4 sm:leading-5 h-4 sm:h-5'
+                        }
+                      >
+                        {selectedVariant.category}
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500 line-clamp-2 leading-4 sm:leading-5 min-h-[2rem] sm:h-10">
+                        {detailText}
+                      </p>
+                      <p className="text-xs sm:text-sm leading-4 sm:leading-5 h-4 sm:h-5">
+                        {selectedVariant.in_stock ? (
+                          <span className="text-transparent" aria-hidden="true">In stock</span>
+                        ) : (
+                          <span className="text-red-600">Out of Stock</span>
+                        )}
+                      </p>
+                    </div>
                   </div>
                 </Link>
 
               {/* Variant Selector */}
               <div className="mt-auto">
-                <div className="mb-3 h-10 flex items-center justify-between gap-3">
-                  <span className="text-lg font-bold text-primary-600 leading-7">
+                <div className="mb-3 flex flex-wrap items-center gap-2 sm:h-10 sm:flex-nowrap sm:justify-between">
+                  <span className="text-base sm:text-lg font-bold text-primary-600 leading-6 sm:leading-7">
                     {selectedVariant.price_display}
                   </span>
                   {hasMultipleVariants ? (
@@ -325,7 +321,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                         id={`size-${baseName}`}
                         value={selectedVariantId}
                         onChange={(e) => setSelectedVariants((prev) => ({ ...prev, [baseName]: e.target.value }))}
-                        className="input text-sm h-10 min-w-[8rem] max-w-[12rem]"
+                        className="input text-xs sm:text-sm h-9 sm:h-10 w-full sm:w-auto sm:min-w-[8rem] sm:max-w-[12rem]"
                         aria-label={`Select option for ${baseName}`}
                       >
                         {variants.map((variant) => (

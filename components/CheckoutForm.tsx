@@ -1,14 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseClient } from '@/lib/db/supabaseClient'
 import { clearCart } from '@/lib/db/cart'
-import { createOrder, createOrderItems, getOrderItems, markOrderSheetSync } from '@/lib/db/orders'
+import { createOrder, createOrderItems } from '@/lib/db/orders'
 import { upsertCustomerProfile } from '@/lib/db/profiles'
-import { getUserEmail } from '@/lib/db/users'
 import { logger } from '@/lib/logger'
-import { sendOrderToSheets } from '@/lib/sheets'
 import { CartItem } from '@/lib/types'
 import { CustomerProfile } from '@/lib/types'
 
@@ -22,6 +20,20 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  const savedAddress = {
+    line1: initialProfile?.address_line1 || '',
+    line2: initialProfile?.address_line2 || '',
+    city: initialProfile?.city || '',
+    state: initialProfile?.state || '',
+    zip: initialProfile?.zip || ''
+  }
+  const hasSavedAddress = Boolean(
+    savedAddress.line1 && savedAddress.city && savedAddress.state && savedAddress.zip
+  )
+
+  const [addressMode, setAddressMode] = useState<'saved' | 'new'>(
+    hasSavedAddress ? 'saved' : 'new'
+  )
   const [formData, setFormData] = useState({
     firstName: initialProfile?.first_name || '',
     lastName: initialProfile?.last_name || '',
@@ -33,6 +45,37 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
     zip: initialProfile?.zip || '',
     notes: ''
   })
+
+  useEffect(() => {
+    if (addressMode === 'saved' && hasSavedAddress) {
+      setFormData((prev) => ({
+        ...prev,
+        addressLine1: savedAddress.line1,
+        addressLine2: savedAddress.line2,
+        city: savedAddress.city,
+        state: savedAddress.state,
+        zip: savedAddress.zip
+      }))
+    }
+    if (addressMode === 'new' && hasSavedAddress) {
+      setFormData((prev) => ({
+        ...prev,
+        addressLine1: '',
+        addressLine2: '',
+        city: '',
+        state: '',
+        zip: ''
+      }))
+    }
+  }, [
+    addressMode,
+    hasSavedAddress,
+    savedAddress.line1,
+    savedAddress.line2,
+    savedAddress.city,
+    savedAddress.state,
+    savedAddress.zip
+  ])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -123,35 +166,15 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
       }
 
       // Clear cart
-      await clearCart(supabaseClient, user.id)
-
-      // Send to Google Sheets
-      const { data: orderItemsData } = await getOrderItems(supabaseClient, order.id)
-
-      // Get user email and name
-      const { data: userEmail } = await getUserEmail(supabaseClient, user.id)
-
-      const customerName = formData.firstName && formData.lastName
-        ? `${formData.firstName} ${formData.lastName}`
-        : undefined
-
-      const sheetsResult = await sendOrderToSheets(
-        order,
-        orderItemsData || [],
-        userEmail || user.email || '',
-        customerName
-      )
-
-      if (!sheetsResult.success) {
-        // Update order with sync failure
-        await markOrderSheetSync(
-          supabaseClient,
-          order.id,
-          false,
-          sheetsResult.error || 'Unknown error'
-        )
+      const { error: clearError } = await clearCart(supabaseClient, user.id)
+      if (clearError) {
+        throw new Error('Failed to clear cart')
+      }
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('cart:updated'))
       }
 
+      // Send to Google Sheets
       // Redirect to order confirmation
       router.push(`/orders/${order.id}?success=true`)
     } catch (error) {
@@ -166,37 +189,14 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Order Summary */}
+        <div className="grid gap-8">
           <div>
-            <h2 className="text-2xl font-semibold mb-4">Order Summary</h2>
-            <div className="card space-y-4">
-              {initialCartItems.map((item) => (
-                <div key={item.id} className="flex justify-between">
-                  <div>
-                    <p className="font-semibold">{item.product?.name || 'Product'}</p>
-                    <p className="text-sm text-gray-600">Qty: {item.qty}</p>
-                  </div>
-                  <p className="font-semibold">{item.product?.price_display || 'Call'}</p>
-                </div>
-              ))}
-              <div className="border-t pt-4">
-                <div className="flex justify-between font-bold text-lg">
-                  <span>Total Items:</span>
-                  <span>{initialCartItems.reduce((sum, item) => sum + item.qty, 0)}</span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+            <h2 className="text-2xl font-semibold mb-4">Delivery Information</h2>
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
               <p className="text-sm text-blue-800">
                 <strong>Note:</strong> Payment is handled by the pharmacy after order review.
               </p>
             </div>
-          </div>
-
-          {/* Checkout Form */}
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Delivery Information</h2>
             <form onSubmit={handleSubmit} className="card space-y-4" noValidate>
               {errors.submit && (
                 <div
@@ -275,6 +275,49 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                 )}
               </div>
 
+              <div className="space-y-3">
+                <p className="label">Delivery Address</p>
+                {hasSavedAddress && (
+                  <label className="flex items-start gap-3 rounded-xl border border-gray-200/60 bg-white/70 p-3">
+                    <input
+                      type="radio"
+                      name="addressMode"
+                      value="saved"
+                      checked={addressMode === 'saved'}
+                      onChange={() => setAddressMode('saved')}
+                      className="mt-1"
+                    />
+                    <span>
+                      <span className="block text-sm font-semibold text-gray-900">Use saved address</span>
+                      <span className="block text-sm text-gray-600">
+                        {savedAddress.line1}
+                        {savedAddress.line2 ? `, ${savedAddress.line2}` : ''},{' '}
+                        {savedAddress.city}, {savedAddress.state} {savedAddress.zip}
+                      </span>
+                    </span>
+                  </label>
+                )}
+                <label className="flex items-start gap-3 rounded-xl border border-gray-200/60 bg-white/70 p-3">
+                  <input
+                    type="radio"
+                    name="addressMode"
+                    value="new"
+                    checked={addressMode === 'new'}
+                    onChange={() => setAddressMode('new')}
+                    className="mt-1"
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-gray-900">Use a new address</span>
+                    <span className="block text-sm text-gray-600">Enter a different delivery address.</span>
+                  </span>
+                </label>
+                {!hasSavedAddress && (
+                  <p className="text-xs text-gray-500">
+                    No saved address yet. Your first order will save one for next time.
+                  </p>
+                )}
+              </div>
+
               <div>
                 <label htmlFor="addressLine1" className="label">
                   Address Line 1 <span className="text-red-600" aria-label="required">*</span>
@@ -286,6 +329,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                   aria-required="true"
                   value={formData.addressLine1}
                   onChange={(e) => setFormData((prev) => ({ ...prev, addressLine1: e.target.value }))}
+                  disabled={addressMode === 'saved' && hasSavedAddress}
                   className={errors.addressLine1 ? 'input-error' : 'input'}
                   aria-describedby={errors.addressLine1 ? 'addressLine1-error' : undefined}
                   aria-invalid={errors.addressLine1 ? 'true' : 'false'}
@@ -306,6 +350,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                   type="text"
                   value={formData.addressLine2}
                   onChange={(e) => setFormData((prev) => ({ ...prev, addressLine2: e.target.value }))}
+                  disabled={addressMode === 'saved' && hasSavedAddress}
                   className="input"
                 />
               </div>
@@ -322,6 +367,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                     aria-required="true"
                     value={formData.city}
                     onChange={(e) => setFormData((prev) => ({ ...prev, city: e.target.value }))}
+                    disabled={addressMode === 'saved' && hasSavedAddress}
                     className={errors.city ? 'input-error' : 'input'}
                     aria-describedby={errors.city ? 'city-error' : undefined}
                     aria-invalid={errors.city ? 'true' : 'false'}
@@ -344,6 +390,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                     maxLength={2}
                     value={formData.state}
                     onChange={(e) => setFormData((prev) => ({ ...prev, state: e.target.value.toUpperCase() }))}
+                    disabled={addressMode === 'saved' && hasSavedAddress}
                     className={errors.state ? 'input-error' : 'input'}
                     aria-describedby={errors.state ? 'state-error' : undefined}
                     aria-invalid={errors.state ? 'true' : 'false'}
@@ -368,6 +415,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                   aria-required="true"
                   value={formData.zip}
                   onChange={(e) => setFormData((prev) => ({ ...prev, zip: e.target.value }))}
+                  disabled={addressMode === 'saved' && hasSavedAddress}
                   className={errors.zip ? 'input-error' : 'input'}
                   aria-describedby={errors.zip ? 'zip-error' : undefined}
                   aria-invalid={errors.zip ? 'true' : 'false'}

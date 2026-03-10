@@ -17,22 +17,14 @@ export function Footer() {
               <p>
                 Phone:{' '}
                 <a
-                  href="tel:+12125551234"
+                  href="tel:+12128776390"
                   className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
                 >
-                  (212) XXX-XXXX
+                  (212) 877-6390
                 </a>
               </p>
-              <p>
-                Email:{' '}
-                <a
-                  href="mailto:orders@chateaudrug.com"
-                  className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
-                >
-                  orders@chateaudrug.com
-                </a>
-              </p>
-              <p>Upper West Side, New York, NY</p>
+
+              <p>181 Amsterdam Ave, New York, NY 10023</p>
             </address>
           </div>
           <div>

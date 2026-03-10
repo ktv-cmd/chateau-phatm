@@ -27,7 +27,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <Navigation />
-        <main id="main-content" role="main">
+        <main id="main-content" role="main" className="pb-20 md:pb-0">
           {children}
         </main>
         <Footer />

@@ -97,23 +97,22 @@ export default function LoginPage() {
         if (userError) {
           logger.error('Error fetching user role:', userError)
           setIsLoading(false)
-          // Use full page reload to ensure cookies are sent
-          window.location.href = '/products'
+          const redirectedFrom = searchParams.get('redirectedFrom')
+          window.location.href = (redirectedFrom && redirectedFrom.startsWith('/')) ? redirectedFrom : '/products'
           return
         }
 
         setIsLoading(false)
         
-        // Use window.location.href for full page reload to ensure cookies are sent to server
-        // This ensures the server sees the session cookies on the next request
-        // Simple admin check: hardcoded email
         const isAdmin = (data.user.email || '').toLowerCase() === 'admin@chateau-demo.com'
-        const targetPath = isAdmin ? '/owner' : '/products'
+        const redirectedFrom = searchParams.get('redirectedFrom')
+        const targetPath = isAdmin
+          ? '/owner'
+          : (redirectedFrom && redirectedFrom.startsWith('/') ? redirectedFrom : '/products')
         window.location.href = targetPath
       } catch (roleError: any) {
         logger.error('Error checking user role:', roleError)
         setIsLoading(false)
-        // Use full page reload to ensure cookies are sent
         window.location.href = '/products'
       }
     } catch (err: any) {

@@ -80,7 +80,6 @@ export function OwnerOrdersList({ orders, selectedStatus }: OwnerOrdersListProps
                   <th scope="col" className="text-left py-3 px-4">Date</th>
                   <th scope="col" className="text-left py-3 px-4">Status</th>
                   <th scope="col" className="text-right py-3 px-4">Items</th>
-                  <th scope="col" className="text-left py-3 px-4">Sync Status</th>
                   <th scope="col" className="text-left py-3 px-4">Actions</th>
                 </tr>
               </thead>
@@ -106,13 +105,6 @@ export function OwnerOrdersList({ orders, selectedStatus }: OwnerOrdersListProps
                     </td>
                     <td className="py-3 px-4">{getStatusBadge(order.status)}</td>
                     <td className="text-right py-3 px-4">{order.total_items}</td>
-                    <td className="py-3 px-4">
-                      {order.sheet_sync_failed ? (
-                        <span className="text-red-600">Failed</span>
-                      ) : (
-                        <span className="text-green-600">Synced</span>
-                      )}
-                    </td>
                     <td className="py-3 px-4">
                       <Link
                         href={`/owner/orders/${order.id}`}

@@ -10,11 +10,12 @@ import { addCartItem, getCartItemByProduct, updateCartItemQty } from '@/lib/db/c
 interface ProductDetailProps {
   product: Product
   returnTo?: string | null
+  isAuthenticated?: boolean
 }
 
 const DEFAULT_DESCRIPTION = 'Quality healthcare product for home use.'
 
-export function ProductDetail({ product, returnTo }: ProductDetailProps) {
+export function ProductDetail({ product, returnTo, isAuthenticated = false }: ProductDetailProps) {
   const router = useRouter()
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
@@ -109,7 +110,27 @@ export function ProductDetail({ product, returnTo }: ProductDetailProps) {
               <p className="text-gray-700">{descriptionText}</p>
             </div>
 
-            {product.in_stock ? (
+            {!isAuthenticated ? (
+              <div className="rounded-2xl border border-primary-100 bg-primary-50/60 px-5 py-4 space-y-3">
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Want to order this product?</span> Create a free account or log in to add it to your cart.
+                </p>
+                <div className="flex gap-3">
+                  <Link
+                    href={`/login?redirectedFrom=/products/${product.id}`}
+                    className="btn-primary text-sm flex-1 text-center"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    href={`/signup?redirectedFrom=/products/${product.id}`}
+                    className="btn-secondary text-sm flex-1 text-center"
+                  >
+                    Create Account
+                  </Link>
+                </div>
+              </div>
+            ) : product.in_stock ? (
               <div className="space-y-4">
                 <div>
                   <label htmlFor="quantity" className="label">Quantity</label>

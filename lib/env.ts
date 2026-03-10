@@ -1,11 +1,6 @@
 import 'server-only'
 import { z } from 'zod'
 
-const optionalUrl = z.preprocess(
-  (value) => (value === '' ? undefined : value),
-  z.string().url().optional()
-)
-
 const envSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url('NEXT_PUBLIC_SUPABASE_URL must be a valid URL'),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z
@@ -16,7 +11,6 @@ const envSchema = z.object({
     .string()
     .min(1, 'SUPABASE_SERVICE_ROLE_KEY is required')
     .regex(/^eyJ/, 'SUPABASE_SERVICE_ROLE_KEY must look like a JWT'),
-  NEXT_PUBLIC_SHEETS_WEBHOOK_URL: optionalUrl
 })
 
 const parsed = envSchema.safeParse(process.env)

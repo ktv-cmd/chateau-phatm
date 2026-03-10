@@ -7,10 +7,16 @@ export async function getOwnerStats(supabase: SupabaseClient) {
     supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'NEW')
   ])
 
+  const refillsResult = await supabase
+    .from('refill_requests')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'NEW')
+
   return {
     totalOrders: ordersResult.count || 0,
     totalProducts: productsResult.count || 0,
-    newOrders: newOrdersResult.count || 0
+    newOrders: newOrdersResult.count || 0,
+    newRefills: refillsResult.count || 0
   }
 }
 

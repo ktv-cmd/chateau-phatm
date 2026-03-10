@@ -82,6 +82,16 @@ CREATE TABLE IF NOT EXISTS public.orders (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Refill requests
+CREATE TABLE IF NOT EXISTS public.refill_requests (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  refill_number TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'NEW' CHECK (status IN ('NEW', 'IN_PROGRESS', 'COMPLETED', 'CANCELED')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Order items
 CREATE TABLE IF NOT EXISTS public.order_items (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -104,6 +114,8 @@ CREATE INDEX IF NOT EXISTS idx_products_in_stock ON public.products(in_stock);
 CREATE INDEX IF NOT EXISTS idx_products_active ON public.products(is_active);
 CREATE INDEX IF NOT EXISTS idx_product_images_product_id ON public.product_images(product_id);
 CREATE INDEX IF NOT EXISTS idx_product_images_sort ON public.product_images(sort_order);
+CREATE INDEX IF NOT EXISTS idx_refill_requests_user_id ON public.refill_requests(user_id);
+CREATE INDEX IF NOT EXISTS idx_refill_requests_status ON public.refill_requests(status);
 
 -- Row Level Security (RLS) Policies
 
@@ -115,6 +127,7 @@ ALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.refill_requests ENABLE ROW LEVEL SECURITY;
 
 -- Base privileges for API roles
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
@@ -125,6 +138,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.orders TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.order_items TO authenticated;
 GRANT SELECT ON TABLE public.products TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.product_images TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.refill_requests TO authenticated;
 
 -- Owner check helper (avoids RLS recursion)
 CREATE OR REPLACE FUNCTION public.is_owner()
@@ -261,6 +275,27 @@ CREATE POLICY "Users can insert their own order items"
 DROP POLICY IF EXISTS "Owners can view all order items" ON public.order_items;
 CREATE POLICY "Owners can view all order items"
   ON public.order_items FOR SELECT
+  USING (public.is_owner());
+
+-- Refill requests policies
+DROP POLICY IF EXISTS "Users can view their own refill requests" ON public.refill_requests;
+CREATE POLICY "Users can view their own refill requests"
+  ON public.refill_requests FOR SELECT
+  USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Owners can view all refill requests" ON public.refill_requests;
+CREATE POLICY "Owners can view all refill requests"
+  ON public.refill_requests FOR SELECT
+  USING (public.is_owner());
+
+DROP POLICY IF EXISTS "Users can insert their own refill requests" ON public.refill_requests;
+CREATE POLICY "Users can insert their own refill requests"
+  ON public.refill_requests FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Owners can update refill requests" ON public.refill_requests;
+CREATE POLICY "Owners can update refill requests"
+  ON public.refill_requests FOR UPDATE
   USING (public.is_owner());
 
 -- Product images policies

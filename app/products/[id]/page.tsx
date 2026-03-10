@@ -1,4 +1,4 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth-server'
 import { isAdmin } from '@/lib/roles'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
@@ -12,9 +12,6 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params, searchParams }: ProductPageProps) {
   const user = await getCurrentUser()
-  if (!user) {
-    redirect('/login')
-  }
 
   const serverSupabase = await supabaseServerClient()
 
@@ -24,9 +21,13 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
     notFound()
   }
 
-  if (!isAdmin(user.email) && product.is_active === false) {
+  if (!user && product.is_active === false) {
     notFound()
   }
 
-  return <ProductDetail product={product} returnTo={searchParams?.returnTo} />
+  if (user && !isAdmin(user.email) && product.is_active === false) {
+    notFound()
+  }
+
+  return <ProductDetail product={product} returnTo={searchParams?.returnTo} isAuthenticated={!!user} />
 }

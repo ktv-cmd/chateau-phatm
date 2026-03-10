@@ -3,10 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Order, OrderItem } from '@/lib/types'
-import { supabaseClient } from '@/lib/db/supabaseClient'
-import { getCustomerName } from '@/lib/db/owner'
-import { markOrderSheetSync } from '@/lib/db/orders'
-import { sendOrderToSheets } from '@/lib/sheets'
 
 interface OwnerOrderDetailProps {
   order: Order
@@ -19,7 +15,6 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
   const [isUpdating, setIsUpdating] = useState(false)
   const [newStatus, setNewStatus] = useState<Order['status']>(order.status)
   const [statusError, setStatusError] = useState<string | null>(null)
-  const [isResending, setIsResending] = useState(false)
 
   async function handleStatusUpdate() {
     setIsUpdating(true)
@@ -39,23 +34,6 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
 
       router.refresh()
     setIsUpdating(false)
-  }
-
-  async function handleResendToSheets() {
-    setIsResending(true)
-    // Try to get customer name from profile
-    const { data: customerName } = await getCustomerName(supabaseClient, order.user_id)
-
-    const result = await sendOrderToSheets(order, orderItems, customerEmail, customerName)
-
-    if (result.success) {
-      await markOrderSheetSync(supabaseClient, order.id, true)
-    } else {
-      await markOrderSheetSync(supabaseClient, order.id, false, result.error || 'Unknown error')
-    }
-
-    setIsResending(false)
-    router.refresh()
   }
 
   function getStatusBadge(status: Order['status']) {
@@ -80,6 +58,16 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-primary-700 mb-6"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to orders
+        </button>
         <h1 className="text-3xl font-bold mb-8">Order Details</h1>
 
         <div className="card mb-6">
@@ -163,24 +151,6 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
             </div>
           )}
 
-          {order.sheet_sync_failed && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              <p className="font-semibold mb-2">⚠️ Failed to sync to Google Sheets</p>
-              {order.sheet_sync_error && (
-                <p className="text-sm mb-2">{order.sheet_sync_error}</p>
-              )}
-              <button
-                onClick={handleResendToSheets}
-                disabled={isResending}
-                className="btn-primary mt-2"
-                aria-label="Resend order to Google Sheets"
-                aria-disabled={isResending}
-                aria-busy={isResending}
-              >
-                {isResending ? 'Resending...' : 'Resend to Sheets'}
-              </button>
-            </div>
-          )}
         </div>
 
         <div className="card mb-6">
