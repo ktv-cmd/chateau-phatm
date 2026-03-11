@@ -83,7 +83,7 @@ export default async function HomePage({
           </div>
           <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
             {featuredCategories.map((category) => {
-              const words = category.split(/[\s&\-/]+/).filter(w => w.length > 1 && w.toLowerCase() !== 'the')
+              const words = category.split(/[\s&\-/]+/).filter((w: string) => w.length > 1 && w.toLowerCase() !== 'the')
               const abbrev = words.length >= 2
                 ? (words[0][0] + words[1][0]).toUpperCase()
                 : category.trim().slice(0, 2).toUpperCase()
