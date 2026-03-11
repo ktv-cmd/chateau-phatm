@@ -45,6 +45,7 @@ export function CartView({ cartItems: initialCartItems }: CartViewProps) {
       setCartItems((prev) =>
         prev.map((item) => (item.id === itemId ? { ...item, qty: newQty } : item))
       )
+      window.dispatchEvent(new CustomEvent('cart:updated'))
     }
 
     setIsUpdating(null)
@@ -63,6 +64,7 @@ export function CartView({ cartItems: initialCartItems }: CartViewProps) {
 
     if (!error) {
       setCartItems((prev) => prev.filter((item) => item.id !== itemId))
+      window.dispatchEvent(new CustomEvent('cart:updated'))
     }
 
     setIsRemoving(null)
