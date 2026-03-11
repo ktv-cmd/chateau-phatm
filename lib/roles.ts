@@ -7,6 +7,5 @@ export function isAdmin(email?: string | null) {
 
 // Keep old function name for backward compatibility during migration
 export function isOwnerRole(role?: string | null) {
-  // This is deprecated - use isAdmin(email) instead
-  return false
+  return role === 'ADMIN'
 }

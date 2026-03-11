@@ -32,6 +32,7 @@ export function SearchAutocomplete({
   const [error, setError] = useState<string | null>(null)
   const [highlightIndex, setHighlightIndex] = useState(-1)
   const blurTimeout = useRef<number | null>(null)
+  const isFocusedRef = useRef(false)
 
   const trimmedValue = value.trim()
 
@@ -73,7 +74,7 @@ export function SearchAutocomplete({
         const data = await response.json()
         setSuggestions(data.suggestions || [])
         onSafety?.(data.safety?.warnings || [])
-        setIsOpen(true)
+        if (isFocusedRef.current) setIsOpen(true)
         setHighlightIndex(-1)
       } catch (err) {
         setSuggestions([])
@@ -136,9 +137,13 @@ export function SearchAutocomplete({
         aria-controls={`${id}-listbox`}
         aria-activedescendant={highlightIndex >= 0 ? `${id}-option-${highlightIndex}` : undefined}
         onFocus={() => {
+          isFocusedRef.current = true
           if (trimmedValue.length >= minLength) setIsOpen(true)
         }}
-        onBlur={handleBlur}
+        onBlur={() => {
+          isFocusedRef.current = false
+          handleBlur()
+        }}
         onKeyDown={handleKeyDown}
       />
 

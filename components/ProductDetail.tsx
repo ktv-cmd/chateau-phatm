@@ -9,21 +9,34 @@ import { addCartItem, getCartItemByProduct, updateCartItemQty } from '@/lib/db/c
 
 interface ProductDetailProps {
   product: Product
+  variants?: Product[]
   returnTo?: string | null
   isAuthenticated?: boolean
 }
 
 const DEFAULT_DESCRIPTION = 'Quality healthcare product for home use.'
 
-export function ProductDetail({ product, returnTo, isAuthenticated = false }: ProductDetailProps) {
+export function ProductDetail({ product, variants = [], returnTo, isAuthenticated = false }: ProductDetailProps) {
   const router = useRouter()
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
   const backHref = returnTo && returnTo.startsWith('/') ? returnTo : '/products'
+  const backLabel = !returnTo
+    ? '← Back to products'
+    : returnTo === '/'
+    ? '← Back to home'
+    : '← Back to results'
   const descriptionText = product.description?.trim() || DEFAULT_DESCRIPTION
   const titleText = product.base_product_name || product.name
   const sizeBadgeText =
     product.variant_size && product.variant_size.toLowerCase() !== 'standard' ? product.variant_size : null
+  const hasMultipleVariants = variants.length > 1
+
+  function handleVariantChange(variantId: string) {
+    if (variantId === product.id) return
+    const returnParam = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ''
+    router.push(`/products/${variantId}${returnParam}`)
+  }
 
   async function handleAddToCart() {
     setIsAdding(true)
@@ -57,13 +70,13 @@ export function ProductDetail({ product, returnTo, isAuthenticated = false }: Pr
             href={backHref}
             className="inline-flex items-center text-sm text-gray-600 hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
           >
-            ← Back to results
+            {backLabel}
           </Link>
         </div>
 
         <nav aria-label="Breadcrumb" className="mb-4">
           <ol className="flex space-x-2 text-sm text-gray-600">
-            <li><Link href={backHref} className="hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">Products</Link></li>
+            <li><Link href="/products" className="hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">Products</Link></li>
             <li aria-hidden="true">/</li>
             <li className="text-gray-900">{titleText}</li>
           </ol>
@@ -103,7 +116,30 @@ export function ProductDetail({ product, returnTo, isAuthenticated = false }: Pr
             {product.brand && (
               <p className="text-sm text-gray-500 mb-4">Brand: {product.brand}</p>
             )}
-            <p className="text-3xl font-bold text-primary-600 mb-6">{product.price_display}</p>
+            <p className="text-3xl font-bold text-primary-600 mb-4">{product.price_display}</p>
+
+            {hasMultipleVariants && (
+              <div className="mb-6">
+                <label htmlFor="variant-select" className="label">
+                  Size / Option
+                </label>
+                <select
+                  id="variant-select"
+                  value={product.id}
+                  onChange={(e) => handleVariantChange(e.target.value)}
+                  className="input max-w-xs"
+                  aria-label="Select product size or option"
+                >
+                  {variants.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.variant_size && v.variant_size.toLowerCase() !== 'standard'
+                        ? `${v.variant_size} — ${v.price_display}`
+                        : v.price_display}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="mb-6">
               <h2 className="text-xl font-semibold mb-2">Description</h2>

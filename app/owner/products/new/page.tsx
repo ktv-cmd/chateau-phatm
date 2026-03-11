@@ -1,5 +1,10 @@
 import { redirect } from 'next/navigation'
+import type { Metadata } from 'next'
 import { getCurrentUser } from '@/lib/auth-server'
+
+export const metadata: Metadata = {
+  title: 'New Product | Admin — Chateau Drug & Homecare',
+}
 import { isAdmin } from '@/lib/roles'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
 import { listProductCategories } from '@/lib/db/products'

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabaseClient, isSupabaseConfigured } from '@/lib/db/supabaseClient'
 import { logger } from '@/lib/logger'
@@ -18,6 +18,10 @@ export default function SignupPage() {
   const [emailError, setEmailError] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const supabaseReady = isSupabaseConfigured()
+
+  useEffect(() => {
+    document.title = 'Create Account | Chateau Drug & Homecare'
+  }, [])
 
   // Real-time email validation
   function validateEmail(emailValue: string) {
@@ -172,7 +176,7 @@ export default function SignupPage() {
     <div className="page flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="card max-w-md w-full space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-center">Sign Up</h1>
+          <h1 className="text-3xl font-bold text-center">Create Account</h1>
           <p className="mt-2 text-center text-gray-600">
             Create an account to start ordering
           </p>

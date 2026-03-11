@@ -81,9 +81,16 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Redirect logged-in users away from /login
+  // Redirect logged-in users away from /login based on role
   if (request.nextUrl.pathname === '/login' && user) {
-    return NextResponse.redirect(new URL('/owner', request.url))
+    const isAdminUser = user.email?.toLowerCase() === 'admin@chateau-demo.com'
+    if (isAdminUser) {
+      return NextResponse.redirect(new URL('/owner', request.url))
+    } else {
+      const redirectTo = request.nextUrl.searchParams.get('redirectedFrom')
+      const destination = redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('/owner') ? redirectTo : '/products'
+      return NextResponse.redirect(new URL(destination, request.url))
+    }
   }
 
   return response

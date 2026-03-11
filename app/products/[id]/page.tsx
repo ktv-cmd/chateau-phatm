@@ -2,12 +2,23 @@ import { notFound } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth-server'
 import { isAdmin } from '@/lib/roles'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
-import { getProductById } from '@/lib/db/products'
+import { getProductById, getProductVariants } from '@/lib/db/products'
 import { ProductDetail } from '@/components/ProductDetail'
+import type { Metadata } from 'next'
 
 interface ProductPageProps {
   params: { id: string }
   searchParams?: { returnTo?: string }
+}
+
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const serverSupabase = await supabaseServerClient()
+  const { data: product } = await getProductById(serverSupabase, params.id)
+  if (!product) return { title: 'Product Not Found | Chateau Drug & Homecare' }
+  const title = product.base_product_name || product.name
+  return {
+    title: `${title} | Chateau Drug & Homecare`,
+  }
 }
 
 export default async function ProductPage({ params, searchParams }: ProductPageProps) {
@@ -29,5 +40,7 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
     notFound()
   }
 
-  return <ProductDetail product={product} returnTo={searchParams?.returnTo} isAuthenticated={!!user} />
+  const variants = await getProductVariants(serverSupabase, product)
+
+  return <ProductDetail product={product} variants={variants} returnTo={searchParams?.returnTo} isAuthenticated={!!user} />
 }

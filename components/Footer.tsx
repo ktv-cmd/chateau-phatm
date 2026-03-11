@@ -1,6 +1,12 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export function Footer() {
+  const pathname = usePathname()
+  const isAdminPath = pathname?.startsWith('/owner')
+
   return (
     <footer className="mt-16 border-t border-gray-200/60 bg-white/60 backdrop-blur" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
@@ -23,28 +29,49 @@ export function Footer() {
                   (212) 877-6390
                 </a>
               </p>
-
               <p>181 Amsterdam Ave, New York, NY 10023</p>
             </address>
           </div>
           <div>
             <h3 className="text-sm font-semibold mb-3 text-gray-900">Quick links</h3>
             <ul className="space-y-2 text-gray-600">
-              <li>
-                <Link href="/products" className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">
-                  Products
-                </Link>
-              </li>
-              <li>
-                <Link href="/login" className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">
-                  Log In
-                </Link>
-              </li>
-              <li>
-                <Link href="/signup" className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">
-                  Sign Up
-                </Link>
-              </li>
+              {isAdminPath ? (
+                <>
+                  <li>
+                    <Link href="/owner" className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">
+                      Dashboard
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/owner/orders" className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">
+                      Orders
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/owner/products" className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">
+                      Products
+                    </Link>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link href="/products" className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">
+                      Products
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/login" className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">
+                      Log In
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/signup" className="font-medium text-gray-900 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">
+                      Sign Up
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>

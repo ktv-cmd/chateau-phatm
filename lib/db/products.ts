@@ -116,6 +116,30 @@ export async function getProductById(supabase: SupabaseClient, id: string) {
   return { data: data as Product | null, error }
 }
 
+export async function getProductVariants(supabase: SupabaseClient, product: Product): Promise<Product[]> {
+  const baseName = product.base_product_name
+  if (!baseName) return [product]
+
+  const useFixture =
+    process.env.SEARCH_DATA_SOURCE === 'fixture' || process.env.SEARCH_FIXTURE_MODE === 'true'
+
+  if (useFixture) {
+    const siblings = (fixtureProducts as Product[]).filter(
+      (p) => p.base_product_name === baseName && p.is_active !== false
+    )
+    return siblings.length > 1 ? siblings : [product]
+  }
+
+  const { data } = await supabase
+    .from('products')
+    .select('*')
+    .eq('base_product_name', baseName)
+    .eq('is_active', true)
+    .order('variant_size')
+  const siblings = (data as Product[]) || []
+  return siblings.length > 1 ? siblings : [product]
+}
+
 export async function createProduct(supabase: SupabaseClient, payload: Partial<Product>) {
   const { data, error } = await supabase.from('products').insert(payload).select().single()
   return { data: data as Product | null, error }

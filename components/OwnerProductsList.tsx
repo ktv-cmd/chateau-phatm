@@ -21,7 +21,7 @@ export function OwnerProductsList({
 }: OwnerProductsListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [products] = useState(initialProducts)
+  const [products, setProducts] = useState(initialProducts)
   const [search, setSearch] = useState(searchQuery || '')
   const [activeStatus, setActiveStatus] = useState(activeFilter || '')
 
@@ -44,6 +44,7 @@ export function OwnerProductsList({
       return
     }
 
+    setProducts((prev) => prev.filter((p) => p.id !== productId))
     router.refresh()
   }
 

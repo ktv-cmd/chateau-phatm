@@ -9,7 +9,7 @@ import { OrdersList } from '@/components/OrdersList'
 export default async function OrdersPage() {
   const user = await getCurrentUser()
   if (!user) {
-    redirect('/login')
+    redirect('/login?redirectedFrom=/orders')
   }
 
   if (isAdmin(user.email)) {

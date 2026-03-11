@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth-server'
 import { isAdmin } from '@/lib/roles'
@@ -10,6 +11,10 @@ export const dynamic = 'force-dynamic'
 
 interface OwnerOrderPageProps {
   params: { id: string }
+}
+
+export async function generateMetadata({ params }: OwnerOrderPageProps): Promise<Metadata> {
+  return { title: `Order #${params.id.slice(0, 8)} | Admin — Chateau Drug & Homecare` }
 }
 
 export default async function OwnerOrderPage({ params }: OwnerOrderPageProps) {

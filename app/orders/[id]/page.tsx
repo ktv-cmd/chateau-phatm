@@ -13,7 +13,7 @@ interface OrderPageProps {
 export default async function OrderPage({ params, searchParams }: OrderPageProps) {
   const user = await getCurrentUser()
   if (!user) {
-    redirect('/login')
+    redirect(`/login?redirectedFrom=/orders/${params.id}`)
   }
 
   const serverSupabase = await supabaseServerClient()

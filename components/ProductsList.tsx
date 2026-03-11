@@ -7,6 +7,9 @@ import { Product, ProductWithVariants } from '@/lib/types'
 import { supabaseClient } from '@/lib/db/supabaseClient'
 import { addCartItem, deleteCartItem, getCartSummary, updateCartItemQty } from '@/lib/db/cart'
 import { logger } from '@/lib/logger'
+import { SearchAutocomplete } from '@/components/SearchAutocomplete'
+import { SafetyBanner } from '@/components/SafetyBanner'
+import { SearchSafetyWarning } from '@/lib/search/types'
 
 const DEFAULT_DESCRIPTION = 'Quality healthcare product for home use.'
 
@@ -15,6 +18,8 @@ interface ProductsListProps {
   categories: string[]
   selectedCategory?: string
   searchQuery?: string
+  /** Hide the inline search bar when a nav-level search input is already present */
+  hideSearch?: boolean
 }
 
 // Group products by base name and sort variants
@@ -54,12 +59,14 @@ function groupProductVariants(products: Product[]): ProductWithVariants[] {
   return Object.values(groups)
 }
 
-export function ProductsList({ products, categories, selectedCategory, searchQuery: _searchQuery }: ProductsListProps) {
+export function ProductsList({ products, categories, selectedCategory, searchQuery: initialSearchQuery, hideSearch = false }: ProductsListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isUpdating, setIsUpdating] = useState<string | null>(null)
   const [cartByProduct, setCartByProduct] = useState<Record<string, { id: string; qty: number }>>({})
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
+  const [searchValue, setSearchValue] = useState(initialSearchQuery || '')
+  const [safetyWarnings, setSafetyWarnings] = useState<SearchSafetyWarning[]>([])
   // Group products by variants
   const groupedProducts = useMemo(() => groupProductVariants(products), [products])
   const isSearchMode = Boolean(searchParams?.get('search'))
@@ -104,7 +111,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
     const { data: { user } } = await supabaseClient.auth.getUser()
     if (!user) {
       setIsUpdating(null)
-      router.push(`/login?redirectedFrom=/products`)
+      router.push(`/login?redirectedFrom=${encodeURIComponent(returnTo)}`)
       return
     }
 
@@ -135,7 +142,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
     const { data: { user } } = await supabaseClient.auth.getUser()
     if (!user) {
       setIsUpdating(null)
-      router.push(`/login?redirectedFrom=/products`)
+      router.push(`/login?redirectedFrom=${encodeURIComponent(returnTo)}`)
       return
     }
 
@@ -177,8 +184,38 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
     return query ? `/products?${query}` : '/products'
   }, [searchParams])
 
+  function handleSearchSubmit(q?: string) {
+    const query = (q ?? searchValue).trim()
+    const params = new URLSearchParams(searchParams.toString())
+    if (query) {
+      params.set('search', query)
+    } else {
+      params.delete('search')
+    }
+    router.push(`/products?${params.toString()}`)
+  }
+
   return (
     <div>
+      {/* Inline search + safety banner (shown when there is no nav-level search) */}
+      {!hideSearch && (
+        <div className="mb-4">
+          <label htmlFor="products-search" className="sr-only">
+            Search products
+          </label>
+          <SearchAutocomplete
+            id="products-search"
+            value={searchValue}
+            onChange={setSearchValue}
+            onSubmit={handleSearchSubmit}
+            onSafety={setSafetyWarnings}
+            placeholder="Search products, brands, or categories…"
+            ariaLabel="Search products"
+          />
+          <SafetyBanner warnings={safetyWarnings} />
+        </div>
+      )}
+
       {/* Filters */}
       <div className="mb-6 space-y-4">
         <div className="flex items-center justify-between gap-3">

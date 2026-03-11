@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { SearchAutocomplete } from '@/components/SearchAutocomplete'
 import { SafetyBanner } from '@/components/SafetyBanner'
 import { SearchSafetyWarning } from '@/lib/search/types'
@@ -16,12 +16,18 @@ import { isAdmin } from '@/lib/roles'
 export function Navigation() {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [user, setUser] = useState<User | null>(null)
   const [cartCount, setCartCount] = useState(0)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [sessionSynced, setSessionSynced] = useState(false)
-  const [searchValue, setSearchValue] = useState('')
+  const [searchValue, setSearchValue] = useState(searchParams.get('search') ?? '')
   const [safetyWarnings, setSafetyWarnings] = useState<SearchSafetyWarning[]>([])
+
+  // Keep search input in sync when URL search param changes (e.g. back/forward navigation)
+  useEffect(() => {
+    setSearchValue(searchParams.get('search') ?? '')
+  }, [searchParams])
 
   useEffect(() => {
     loadUser()
@@ -166,7 +172,7 @@ export function Navigation() {
               <Link
                 href="/"
                 className="text-lg sm:text-xl font-semibold tracking-tight text-gray-900 hover:text-gray-900 focus:text-gray-900"
-                aria-label="Chateau Pharmacy home"
+                aria-label="Chateau Drug & Homecare home"
               >
                 <span className="flex items-center gap-2">
                   <img
@@ -175,7 +181,7 @@ export function Navigation() {
                     className="h-8 w-auto"
                   />
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">
-                  Chateau Pharmacy
+                  Chateau Drug & Homecare
                   </span>
                 </span>
               </Link>
@@ -285,7 +291,7 @@ export function Navigation() {
                   submitSearch()
                 }}
                 className="flex items-center gap-2"
-                aria-label="Search products"
+                role="search"
               >
                 <label htmlFor="nav-search" className="sr-only">
                   Search products
@@ -421,7 +427,7 @@ export function Navigation() {
       >
         {isAdmin(user?.email) ? (
           /* Admin bottom nav */
-          <div className="grid grid-cols-4 py-1">
+          <div className="grid grid-cols-5 py-1">
             <Link
               href="/owner"
               className={`flex flex-col items-center justify-center gap-0.5 rounded-md px-2 py-1.5 text-[11px] font-medium leading-4 transition-colors ${
@@ -478,6 +484,17 @@ export function Navigation() {
               </svg>
               Products
             </Link>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="flex flex-col items-center justify-center gap-0.5 rounded-md px-2 py-1.5 text-[11px] font-medium leading-4 transition-colors text-gray-600 hover:text-red-600"
+              aria-label="Sign out"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sign Out
+            </button>
           </div>
         ) : (
           /* Customer bottom nav */

@@ -10,7 +10,7 @@ interface ProfilePageProps {
 export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   const user = await getCurrentUser()
   if (!user) {
-    redirect('/login')
+    redirect('/login?redirectedFrom=/profile')
   }
 
   if (isAdmin(user.email)) {

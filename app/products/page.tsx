@@ -55,6 +55,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             categories={categories}
             selectedCategory={searchParams.category}
             searchQuery={searchParams.search}
+            hideSearch
           />
         </Suspense>
       </div>

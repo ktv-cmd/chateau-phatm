@@ -1,4 +1,5 @@
 import { notFound, redirect } from 'next/navigation'
+import type { Metadata } from 'next'
 import { getCurrentUser } from '@/lib/auth-server'
 import { isAdmin } from '@/lib/roles'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
@@ -8,6 +9,13 @@ import { OwnerProductEditor } from '@/components/OwnerProductEditor'
 
 interface OwnerProductPageProps {
   params: { id: string }
+}
+
+export async function generateMetadata({ params }: OwnerProductPageProps): Promise<Metadata> {
+  const supabase = await supabaseServerClient()
+  const { data: product } = await getProductById(supabase, params.id)
+  const name = product?.name || 'Product'
+  return { title: `Edit: ${name} | Admin — Chateau Drug & Homecare` }
 }
 
 export default async function OwnerProductPage({ params }: OwnerProductPageProps) {

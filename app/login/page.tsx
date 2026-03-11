@@ -14,13 +14,39 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [verifyMessage, setVerifyMessage] = useState(false)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotSent, setForgotSent] = useState(false)
+  const [forgotLoading, setForgotLoading] = useState(false)
   const supabaseReady = isSupabaseConfigured()
+  const redirectedFrom = searchParams.get('redirectedFrom')
+
+  useEffect(() => {
+    document.title = 'Log In | Chateau Drug & Homecare'
+  }, [])
 
   useEffect(() => {
     if (searchParams.get('verify') === 'true') {
       setVerifyMessage(true)
     }
   }, [searchParams, supabaseReady])
+
+  async function handleForgotPassword(e: React.FormEvent) {
+    e.preventDefault()
+    if (!forgotEmail.trim()) return
+    setForgotLoading(true)
+    try {
+      await supabaseClient.auth.resetPasswordForEmail(forgotEmail.trim(), {
+        redirectTo: `${window.location.origin}/login`,
+      })
+      setForgotSent(true)
+    } catch {
+      // Show success anyway to avoid user enumeration
+      setForgotSent(true)
+    } finally {
+      setForgotLoading(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -107,8 +133,8 @@ export default function LoginPage() {
         const isAdmin = (data.user.email || '').toLowerCase() === 'admin@chateau-demo.com'
         const redirectedFrom = searchParams.get('redirectedFrom')
         const targetPath = isAdmin
-          ? '/owner'
-          : (redirectedFrom && redirectedFrom.startsWith('/') ? redirectedFrom : '/products')
+          ? (redirectedFrom && redirectedFrom.startsWith('/owner') ? redirectedFrom : '/owner')
+          : (redirectedFrom && redirectedFrom.startsWith('/') && !redirectedFrom.startsWith('/owner') ? redirectedFrom : '/products')
         window.location.href = targetPath
       } catch (roleError: any) {
         logger.error('Error checking user role:', roleError)
@@ -122,12 +148,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="page flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="page py-12 px-4 sm:px-6 lg:px-8 flex justify-center">
       <div className="card max-w-md w-full space-y-8">
         <div>
           <h1 className="text-3xl font-bold text-center">Log In</h1>
           <p className="mt-2 text-center text-gray-600">
-            Sign in to your account to continue
+            {redirectedFrom
+              ? 'Log in to your account to continue'
+              : 'Welcome back — log in to your account'}
           </p>
         </div>
         <form 
@@ -235,26 +263,73 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <span className="sr-only" id="loading-text">Loading, please wait</span>
-                  Signing in...
+                  Logging in...
                 </>
               ) : (
-                'Sign In'
+                'Log In'
               )}
             </button>
           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Don&apos;t have an account?{' '}
-              <Link
-                href="/signup"
-                className="font-medium text-primary-600 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
-              >
-                Sign up
-              </Link>
-            </p>
+          <div className="flex items-center justify-between text-sm">
+            {!redirectedFrom?.startsWith('/owner') ? (
+              <p className="text-gray-600">
+                Don&apos;t have an account?{' '}
+                <Link
+                  href="/signup"
+                  className="font-medium text-primary-600 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+                >
+                  Sign up
+                </Link>
+              </p>
+            ) : (
+              <span />
+            )}
+            <button
+              type="button"
+              onClick={() => { setShowForgotPassword((v) => !v); setForgotSent(false) }}
+              className="font-medium text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+            >
+              Forgot password?
+            </button>
           </div>
         </form>
+
+        {showForgotPassword && (
+          <div className="border-t border-gray-200 pt-6">
+            {forgotSent ? (
+              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded" role="alert">
+                <p className="font-medium text-sm">Reset link sent</p>
+                <p className="text-sm mt-1">If an account exists for that email, you&apos;ll receive a password reset link shortly.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-3">
+                <h2 className="text-base font-semibold text-gray-900">Reset your password</h2>
+                <p className="text-sm text-gray-600">Enter your email and we&apos;ll send you a reset link.</p>
+                <div>
+                  <label htmlFor="forgot-email" className="label">Email Address</label>
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    required
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    className="input"
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={forgotLoading}
+                  className="btn-secondary w-full"
+                  aria-busy={forgotLoading}
+                >
+                  {forgotLoading ? 'Sending...' : 'Send reset link'}
+                </button>
+              </form>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

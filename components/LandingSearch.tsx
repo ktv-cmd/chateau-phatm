@@ -24,7 +24,7 @@ export function LandingSearch() {
         submit()
       }}
       className="flex flex-col sm:flex-row gap-3"
-      aria-label="Search products"
+      role="search"
     >
       <label htmlFor="landing-search" className="sr-only">
         Search products

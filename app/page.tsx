@@ -83,7 +83,10 @@ export default async function HomePage({
           </div>
           <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
             {featuredCategories.map((category) => {
-              const categoryInitial = category.trim().charAt(0).toUpperCase() || '#'
+              const words = category.split(/[\s&\-/]+/).filter(w => w.length > 1 && w.toLowerCase() !== 'the')
+              const abbrev = words.length >= 2
+                ? (words[0][0] + words[1][0]).toUpperCase()
+                : category.trim().slice(0, 2).toUpperCase()
               return (
                 <Link
                   key={category}
@@ -92,16 +95,11 @@ export default async function HomePage({
                 >
                   <div className="flex items-center gap-3">
                     <span className="h-10 w-10 rounded-full bg-primary-50 text-primary-700 flex items-center justify-center text-sm font-semibold">
-                      {categoryInitial}
+                      {abbrev}
                     </span>
-                    <div>
-                      <span className="block text-[11px] font-medium uppercase tracking-wide text-gray-500">
-                        Category
-                      </span>
-                      <span className="mt-0.5 block text-sm font-semibold text-gray-900 line-clamp-2">
-                        {category}
-                      </span>
-                    </div>
+                    <span className="text-sm font-semibold text-gray-900 line-clamp-2">
+                      {category}
+                    </span>
                   </div>
                 </Link>
               )
@@ -199,7 +197,7 @@ export default async function HomePage({
                   return (
                     <Link
                       key={product.id}
-                      href={`/products/${product.id}`}
+                      href={`/products/${product.id}?returnTo=/`}
                       className="card p-4 sm:p-5 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-primary-500"
                       aria-label={`View ${product.name}`}
                     >

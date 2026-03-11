@@ -8,7 +8,7 @@ import { CartView } from '@/components/CartView'
 export default async function CartPage() {
   const user = await getCurrentUser()
   if (!user) {
-    redirect('/login')
+    redirect('/login?redirectedFrom=/cart')
   }
 
   const serverSupabase = await supabaseServerClient()
