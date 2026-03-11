@@ -65,7 +65,7 @@ export async function listProducts(
   if (search) {
     const trimmed = search.trim()
     if (trimmed) {
-      const terms = splitSearchTerms(trimmed)
+      const terms = splitSearchTerms(normalizeQuery(trimmed))
       const columns = [
         'name',
         'base_product_name',
