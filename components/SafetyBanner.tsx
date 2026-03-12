@@ -22,7 +22,12 @@ export function SafetyBanner({ warnings, storageKey = 'search-safety-dismissed' 
   }
 
   return (
-    <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900">
+    <div
+      className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-semibold">Safety notice</p>
@@ -34,7 +39,8 @@ export function SafetyBanner({ warnings, storageKey = 'search-safety-dismissed' 
         </div>
         <button
           type="button"
-          className="text-sm font-medium underline underline-offset-2"
+          className="text-sm font-medium underline underline-offset-2 focus:outline-none focus:ring-2 focus:ring-amber-600 rounded"
+          aria-label="Dismiss safety notice"
           onClick={() => {
             if (typeof window !== 'undefined') {
               window.sessionStorage.setItem(storageKey, 'true')

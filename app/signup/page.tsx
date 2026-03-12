@@ -187,7 +187,7 @@ export default function SignupPage() {
           {success && !error && (
             <div
               className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded"
-              role="alert"
+              role="status"
               aria-live="polite"
             >
               <div className="flex items-start">
@@ -297,7 +297,7 @@ export default function SignupPage() {
                 </p>
               )}
               {!passwordError && !password && (
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-600">
                   Must be at least 8 characters
                 </p>
               )}

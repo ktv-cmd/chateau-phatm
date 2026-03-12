@@ -155,7 +155,7 @@ export function SearchAutocomplete({
       />
 
       {isLoading && (
-        <div className="absolute right-3 top-3 text-xs text-gray-500" aria-live="polite">
+        <div className="absolute right-3 top-3 text-xs text-gray-600" aria-live="polite" role="status">
           Loading...
         </div>
       )}
@@ -204,7 +204,7 @@ export function SearchAutocomplete({
                       <div className="flex flex-col">
                         <span className="font-medium text-gray-900">{suggestion.value}</span>
                         {suggestion.subtitle ? (
-                          <span className="text-xs text-gray-500">{suggestion.subtitle}</span>
+                          <span className="text-xs text-gray-600">{suggestion.subtitle}</span>
                         ) : null}
                       </div>
                     </li>

@@ -247,7 +247,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
       {groupedProducts.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-600 text-lg">No products found.</p>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-600">
             Try adjusting your search or browse a category below.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
