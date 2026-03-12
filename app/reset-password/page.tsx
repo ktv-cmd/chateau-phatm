@@ -15,11 +15,31 @@ export default function ResetPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    // The /auth/callback route already exchanged the code and set the session.
-    // If there's a valid session here, the user arrived via a genuine reset link.
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      setStatus(session ? 'ready' : 'invalid')
+    // createBrowserClient auto-detects the ?code= in the URL and exchanges it.
+    // We wait for the auth state to settle — PASSWORD_RECOVERY fires when
+    // the exchanged session is from a password reset link.
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+        setStatus('ready')
+      }
     })
+
+    // Also check if there's already an active session (e.g. page refresh)
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setStatus('ready')
+      }
+    })
+
+    // If nothing happens in 5 seconds, the link was invalid or expired
+    const timer = setTimeout(() => {
+      setStatus((current) => current === 'verifying' ? 'invalid' : current)
+    }, 5000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timer)
+    }
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -41,7 +61,6 @@ export default function ResetPasswordPage() {
       setError(updateError.message)
       setIsSubmitting(false)
     } else {
-      // Sign out so the user logs in fresh with the new password
       await supabaseClient.auth.signOut()
       setStatus('success')
     }
@@ -69,7 +88,7 @@ export default function ResetPasswordPage() {
               <p className="font-medium text-red-800 text-sm">Link expired or already used</p>
               <p className="mt-1 text-sm text-red-700">
                 Password reset links expire after 1 hour and can only be used once.
-                Please request a new one.
+                Please request a new one from the login page.
               </p>
             </div>
             <Link href="/login" className="btn-primary w-full text-center block">
