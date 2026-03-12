@@ -15,7 +15,7 @@ export function Toast({ message, type, onClose, duration = 5000 }: ToastProps) {
     return () => clearTimeout(timer)
   }, [duration, onClose])
 
-  const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+  const bgColor = type === 'success' ? 'bg-green-700' : type === 'error' ? 'bg-red-700' : 'bg-blue-700'
   const ariaLive = type === 'error' ? 'assertive' : 'polite'
 
   return (

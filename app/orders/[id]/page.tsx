@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth-server'
 import { isAdmin } from '@/lib/roles'
@@ -8,6 +9,12 @@ import { OrderDetail } from '@/components/OrderDetail'
 interface OrderPageProps {
   params: { id: string }
   searchParams: { success?: string }
+}
+
+export async function generateMetadata({ params }: OrderPageProps): Promise<Metadata> {
+  return {
+    title: `Order #${params.id.slice(0, 8).toUpperCase()} | Chateau Drug & Homecare`,
+  }
 }
 
 export default async function OrderPage({ params, searchParams }: OrderPageProps) {

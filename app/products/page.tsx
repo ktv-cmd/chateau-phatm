@@ -1,5 +1,11 @@
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
+
+export const metadata: Metadata = {
+  title: 'Shop | Chateau Drug & Homecare',
+  description: 'Browse our full range of healthcare and homecare products.',
+}
 import { listProducts, listProductCategories } from '@/lib/db/products'
 import { logger } from '@/lib/logger'
 import { ProductsList } from '@/components/ProductsList'

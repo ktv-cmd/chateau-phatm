@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseClient } from '@/lib/db/supabaseClient'
 import { clearCart } from '@/lib/db/cart'
@@ -19,6 +19,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const errorSummaryRef = useRef<HTMLDivElement>(null)
 
   const savedAddress = {
     line1: initialProfile?.address_line1 || '',
@@ -96,6 +97,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
+      setTimeout(() => errorSummaryRef.current?.focus(), 0)
       return
     }
 
@@ -200,9 +202,11 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
             <form onSubmit={handleSubmit} className="card space-y-4" noValidate>
               {errors.submit && (
                 <div
+                  ref={errorSummaryRef}
                   className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded"
                   role="alert"
                   aria-live="assertive"
+                  tabIndex={-1}
                 >
                   {errors.submit}
                 </div>
@@ -218,6 +222,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                     type="text"
                     required
                     aria-required="true"
+                    autoComplete="given-name"
                     value={formData.firstName}
                     onChange={(e) => setFormData((prev) => ({ ...prev, firstName: e.target.value }))}
                     className={errors.firstName ? 'input-error' : 'input'}
@@ -239,6 +244,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                     type="text"
                     required
                     aria-required="true"
+                    autoComplete="family-name"
                     value={formData.lastName}
                     onChange={(e) => setFormData((prev) => ({ ...prev, lastName: e.target.value }))}
                     className={errors.lastName ? 'input-error' : 'input'}
@@ -262,6 +268,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                   type="tel"
                   required
                   aria-required="true"
+                  autoComplete="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
                   className={errors.phone ? 'input-error' : 'input'}
@@ -275,8 +282,8 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                 )}
               </div>
 
-              <div className="space-y-3">
-                <p className="label">Delivery Address</p>
+              <fieldset className="space-y-3">
+                <legend className="label">Delivery Address</legend>
                 {hasSavedAddress && (
                   <label className="flex items-start gap-3 rounded-xl border border-gray-200/60 bg-white/70 p-3">
                     <input
@@ -316,116 +323,121 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
                     No saved address yet. Your first order will save one for next time.
                   </p>
                 )}
-              </div>
 
-              <div>
-                <label htmlFor="addressLine1" className="label">
-                  Address Line 1 <span className="text-red-600" aria-label="required">*</span>
-                </label>
-                <input
-                  id="addressLine1"
-                  type="text"
-                  required
-                  aria-required="true"
-                  value={formData.addressLine1}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, addressLine1: e.target.value }))}
-                  disabled={addressMode === 'saved' && hasSavedAddress}
-                  className={errors.addressLine1 ? 'input-error' : 'input'}
-                  aria-describedby={errors.addressLine1 ? 'addressLine1-error' : undefined}
-                  aria-invalid={errors.addressLine1 ? 'true' : 'false'}
-                />
-                {errors.addressLine1 && (
-                  <p id="addressLine1-error" className="mt-1 text-sm text-red-600" role="alert">
-                    {errors.addressLine1}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="addressLine2" className="label">
-                  Address Line 2 (Optional)
-                </label>
-                <input
-                  id="addressLine2"
-                  type="text"
-                  value={formData.addressLine2}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, addressLine2: e.target.value }))}
-                  disabled={addressMode === 'saved' && hasSavedAddress}
-                  className="input"
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2">
-                  <label htmlFor="city" className="label">
-                    City <span className="text-red-600" aria-label="required">*</span>
-                  </label>
-                  <input
-                    id="city"
-                    type="text"
-                    required
-                    aria-required="true"
-                    value={formData.city}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, city: e.target.value }))}
-                    disabled={addressMode === 'saved' && hasSavedAddress}
-                    className={errors.city ? 'input-error' : 'input'}
-                    aria-describedby={errors.city ? 'city-error' : undefined}
-                    aria-invalid={errors.city ? 'true' : 'false'}
-                  />
-                  {errors.city && (
-                    <p id="city-error" className="mt-1 text-sm text-red-600" role="alert">
-                      {errors.city}
-                    </p>
-                  )}
-                </div>
                 <div>
-                  <label htmlFor="state" className="label">
-                    State <span className="text-red-600" aria-label="required">*</span>
+                  <label htmlFor="addressLine1" className="label">
+                    Address Line 1 <span className="text-red-600" aria-label="required">*</span>
                   </label>
                   <input
-                    id="state"
+                    id="addressLine1"
                     type="text"
                     required
                     aria-required="true"
-                    maxLength={2}
-                    value={formData.state}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, state: e.target.value.toUpperCase() }))}
+                    autoComplete="street-address"
+                    value={formData.addressLine1}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, addressLine1: e.target.value }))}
                     disabled={addressMode === 'saved' && hasSavedAddress}
-                    className={errors.state ? 'input-error' : 'input'}
-                    aria-describedby={errors.state ? 'state-error' : undefined}
-                    aria-invalid={errors.state ? 'true' : 'false'}
-                    aria-label="State (2-letter abbreviation)"
+                    className={errors.addressLine1 ? 'input-error' : 'input'}
+                    aria-describedby={errors.addressLine1 ? 'addressLine1-error' : undefined}
+                    aria-invalid={errors.addressLine1 ? 'true' : 'false'}
                   />
-                  {errors.state && (
-                    <p id="state-error" className="mt-1 text-sm text-red-600" role="alert">
-                      {errors.state}
+                  {errors.addressLine1 && (
+                    <p id="addressLine1-error" className="mt-1 text-sm text-red-600" role="alert">
+                      {errors.addressLine1}
                     </p>
                   )}
                 </div>
-              </div>
 
-              <div>
-                <label htmlFor="zip" className="label">
-                  ZIP Code <span className="text-red-600" aria-label="required">*</span>
-                </label>
-                <input
-                  id="zip"
-                  type="text"
-                  required
-                  aria-required="true"
-                  value={formData.zip}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, zip: e.target.value }))}
-                  disabled={addressMode === 'saved' && hasSavedAddress}
-                  className={errors.zip ? 'input-error' : 'input'}
-                  aria-describedby={errors.zip ? 'zip-error' : undefined}
-                  aria-invalid={errors.zip ? 'true' : 'false'}
-                />
-                {errors.zip && (
-                  <p id="zip-error" className="mt-1 text-sm text-red-600" role="alert">
-                    {errors.zip}
-                  </p>
-                )}
-              </div>
+                <div>
+                  <label htmlFor="addressLine2" className="label">
+                    Address Line 2 (Optional)
+                  </label>
+                  <input
+                    id="addressLine2"
+                    type="text"
+                    autoComplete="address-line2"
+                    value={formData.addressLine2}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, addressLine2: e.target.value }))}
+                    disabled={addressMode === 'saved' && hasSavedAddress}
+                    className="input"
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="col-span-2">
+                    <label htmlFor="city" className="label">
+                      City <span className="text-red-600" aria-label="required">*</span>
+                    </label>
+                    <input
+                      id="city"
+                      type="text"
+                      required
+                      aria-required="true"
+                      autoComplete="address-level2"
+                      value={formData.city}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, city: e.target.value }))}
+                      disabled={addressMode === 'saved' && hasSavedAddress}
+                      className={errors.city ? 'input-error' : 'input'}
+                      aria-describedby={errors.city ? 'city-error' : undefined}
+                      aria-invalid={errors.city ? 'true' : 'false'}
+                    />
+                    {errors.city && (
+                      <p id="city-error" className="mt-1 text-sm text-red-600" role="alert">
+                        {errors.city}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="state" className="label">
+                      State <span className="text-red-600" aria-label="required">*</span>
+                    </label>
+                    <input
+                      id="state"
+                      type="text"
+                      required
+                      aria-required="true"
+                      maxLength={2}
+                      autoComplete="address-level1"
+                      value={formData.state}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, state: e.target.value.toUpperCase() }))}
+                      disabled={addressMode === 'saved' && hasSavedAddress}
+                      className={errors.state ? 'input-error' : 'input'}
+                      aria-describedby={errors.state ? 'state-error' : undefined}
+                      aria-invalid={errors.state ? 'true' : 'false'}
+                      aria-label="State (2-letter abbreviation)"
+                    />
+                    {errors.state && (
+                      <p id="state-error" className="mt-1 text-sm text-red-600" role="alert">
+                        {errors.state}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="zip" className="label">
+                    ZIP Code <span className="text-red-600" aria-label="required">*</span>
+                  </label>
+                  <input
+                    id="zip"
+                    type="text"
+                    required
+                    aria-required="true"
+                    autoComplete="postal-code"
+                    value={formData.zip}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, zip: e.target.value }))}
+                    disabled={addressMode === 'saved' && hasSavedAddress}
+                    className={errors.zip ? 'input-error' : 'input'}
+                    aria-describedby={errors.zip ? 'zip-error' : undefined}
+                    aria-invalid={errors.zip ? 'true' : 'false'}
+                  />
+                  {errors.zip && (
+                    <p id="zip-error" className="mt-1 text-sm text-red-600" role="alert">
+                      {errors.zip}
+                    </p>
+                  )}
+                </div>
+              </fieldset>
 
               <div>
                 <label htmlFor="notes" className="label">

@@ -1,8 +1,13 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getCurrentUser, getCustomerProfile } from '@/lib/auth-server'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
 import { getCartItemsWithProducts } from '@/lib/db/cart'
 import { CheckoutForm } from '@/components/CheckoutForm'
+
+export const metadata: Metadata = {
+  title: 'Checkout | Chateau Drug & Homecare',
+}
 
 export default async function CheckoutPage() {
   const user = await getCurrentUser()

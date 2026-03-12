@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseClient } from '@/lib/db/supabaseClient'
 import { upsertCustomerProfile } from '@/lib/db/profiles'
@@ -17,6 +17,7 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [success, setSuccess] = useState(false)
+  const errorSummaryRef = useRef<HTMLDivElement>(null)
 
   const [formData, setFormData] = useState({
     firstName: profile?.first_name || '',
@@ -70,6 +71,7 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
     } catch (error) {
       logger.error('Profile update error:', error)
       setErrors({ submit: 'An error occurred. Please try again.' })
+      setTimeout(() => errorSummaryRef.current?.focus(), 0)
     } finally {
       setIsSaving(false)
     }
@@ -113,9 +115,11 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
         <form onSubmit={handleSubmit} className="card space-y-4" noValidate>
           {errors.submit && (
             <div
+              ref={errorSummaryRef}
               className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded"
               role="alert"
               aria-live="assertive"
+              tabIndex={-1}
             >
               {errors.submit}
             </div>

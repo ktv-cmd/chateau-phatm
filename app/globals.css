@@ -78,7 +78,7 @@
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-gray-200/70 rounded-xl shadow-sm bg-white/70 text-gray-900 placeholder:text-gray-400 backdrop-blur focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-400;
+    @apply w-full px-3 py-2 border border-gray-200/70 rounded-xl shadow-sm bg-white/70 text-gray-900 placeholder:text-gray-500 backdrop-blur focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-400;
     min-height: 44px; /* Minimum touch target size */
   }
 

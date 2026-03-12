@@ -1,5 +1,10 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth-server'
+
+export const metadata: Metadata = {
+  title: 'Shopping Cart | Chateau Drug & Homecare',
+}
 import { isAdmin } from '@/lib/roles'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
 import { getCartItemsWithProducts } from '@/lib/db/cart'

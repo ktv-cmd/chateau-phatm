@@ -174,8 +174,8 @@ export function SearchAutocomplete({
           onMouseDown={(event) => event.preventDefault()}
         >
           {Object.entries(groupedSuggestions).map(([type, group]) => (
-            <div key={type} className="border-b border-gray-100 last:border-b-0">
-              <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <div key={type} className="border-b border-gray-100 last:border-b-0" role="group" aria-label={type}>
+              <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-gray-500" aria-hidden="true">
                 {type}
               </div>
               <ul>

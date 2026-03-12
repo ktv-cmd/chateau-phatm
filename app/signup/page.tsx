@@ -149,18 +149,18 @@ export default function SignupPage() {
           }
         }
 
-        // Instacart-style UX: always confirm success, then take user to shopping.
-        // If Supabase requires email verification, they may not be logged-in yet,
-        // but they can still browse products and log in later.
         setSuccess(true)
         setError('')
         setNeedsVerification(!data.session)
         setIsLoading(false)
 
-        // Give the user a moment to read the success message, then redirect.
-        setTimeout(() => {
-          window.location.href = '/products?welcome=true'
-        }, 900)
+        // Only auto-redirect when email verification is NOT required.
+        // If verification is needed, user must act on the email — don't redirect.
+        if (data.session) {
+          setTimeout(() => {
+            window.location.href = '/products?welcome=true'
+          }, 2500)
+        }
       } else {
         setError('Account creation failed. Please try again.')
         setIsLoading(false)
@@ -197,9 +197,16 @@ export default function SignupPage() {
                   <p className="text-sm mt-1">
                     {needsVerification
                       ? 'Please check your email to verify your account. Once verified, you can sign in.'
-                      : 'Taking you to your account...'
-                    }
+                      : 'Your account is ready.'}
                   </p>
+                  {!needsVerification && (
+                    <a
+                      href="/products?welcome=true"
+                      className="mt-2 inline-block text-sm font-medium text-green-800 underline underline-offset-2 focus:outline-none focus:ring-2 focus:ring-green-600 rounded"
+                    >
+                      Continue to shop →
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

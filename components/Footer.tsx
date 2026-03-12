@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { supabaseClient } from '@/lib/db/supabaseClient'
 
 const linkClass = 'text-gray-700 hover:text-primary-700 hover:underline focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded transition-colors'
-const headingClass = 'text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3'
+const headingClass = 'text-xs font-bold uppercase tracking-widest text-gray-600 mb-3'
 
 export function Footer() {
   const pathname = usePathname()

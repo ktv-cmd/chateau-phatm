@@ -16,6 +16,10 @@ export default function ResetPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
+    document.title = 'Reset Password | Chateau Drug & Homecare'
+  }, [])
+
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const code = params.get('code')
     const tokenHash = params.get('token_hash')

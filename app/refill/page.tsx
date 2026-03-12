@@ -1,7 +1,12 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth-server'
 import { isAdmin } from '@/lib/roles'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
+
+export const metadata: Metadata = {
+  title: 'Refill a Prescription | Chateau Drug & Homecare',
+}
 
 async function submitRefillRequest(formData: FormData) {
   'use server'

@@ -68,6 +68,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
   const [searchValue, setSearchValue] = useState(initialSearchQuery || '')
   const [safetyWarnings, setSafetyWarnings] = useState<SearchSafetyWarning[]>([])
+  const [cartAnnouncement, setCartAnnouncement] = useState('')
   // Group products by variants
   const groupedProducts = useMemo(() => groupProductVariants(products), [products])
   const isSearchMode = Boolean(searchParams?.get('search'))
@@ -122,12 +123,14 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
       const { error } = await updateCartItemQty(supabaseClient, existing.id, newQty)
       if (!error) {
         setCartByProduct((prev) => ({ ...prev, [productId]: { id: existing.id, qty: newQty } }))
+        setCartAnnouncement(`Quantity updated to ${newQty}`)
         notifyCartUpdated()
       }
     } else {
       const { data, error } = await addCartItem(supabaseClient, user.id, productId, 1)
       if (!error && data) {
         setCartByProduct((prev) => ({ ...prev, [productId]: { id: data.id, qty: data.qty } }))
+        setCartAnnouncement('Item added to cart')
         notifyCartUpdated()
       }
     }
@@ -155,6 +158,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
           delete next[productId]
           return next
         })
+        setCartAnnouncement('Item removed from cart')
         notifyCartUpdated()
       }
     } else {
@@ -162,6 +166,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
       const { error } = await updateCartItemQty(supabaseClient, existing.id, newQty)
       if (!error) {
         setCartByProduct((prev) => ({ ...prev, [productId]: { id: existing.id, qty: newQty } }))
+        setCartAnnouncement(`Quantity updated to ${newQty}`)
         notifyCartUpdated()
       }
     }
@@ -335,7 +340,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                       </p>
                       <p className="text-xs sm:text-sm leading-4 sm:leading-5 h-4 sm:h-5">
                         {selectedVariant.in_stock ? (
-                          <span className="text-transparent" aria-hidden="true">In stock</span>
+                          <span className="text-green-700">In stock</span>
                         ) : (
                           <span className="text-red-600">Out of Stock</span>
                         )}
@@ -436,6 +441,11 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
           })}
         </div>
       )}
+
+      {/* Screen-reader cart announcements */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {cartAnnouncement}
+      </div>
 
       {/* Sticky mini-cart (mobile-first) */}
       {!isAdmin && totalItems > 0 && (

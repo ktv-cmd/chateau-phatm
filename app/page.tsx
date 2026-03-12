@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth-server'
@@ -5,6 +6,11 @@ import { isAdmin } from '@/lib/roles'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
 import { listProductCategories } from '@/lib/db/products'
 import type { Product } from '@/lib/types'
+
+export const metadata: Metadata = {
+  title: 'Home | Chateau Drug & Homecare',
+  description: 'Your trusted neighborhood pharmacy on the Upper West Side. Fast, friendly service and local delivery.',
+}
 
 const DEFAULT_DESCRIPTION = 'Quality healthcare product for home use.'
 

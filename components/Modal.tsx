@@ -80,7 +80,6 @@ export function Modal({ isOpen, onClose, title, children, ariaLabel }: ModalProp
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
-      aria-label={ariaLabel}
     >
       {/* Backdrop */}
       <div

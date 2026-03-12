@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth-server'
 import { isAdmin } from '@/lib/roles'
@@ -5,6 +6,10 @@ import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
 import { listOrdersForUser } from '@/lib/db/orders'
 import { logger } from '@/lib/logger'
 import { OrdersList } from '@/components/OrdersList'
+
+export const metadata: Metadata = {
+  title: 'My Orders | Chateau Drug & Homecare',
+}
 
 export default async function OrdersPage() {
   const user = await getCurrentUser()

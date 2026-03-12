@@ -12,6 +12,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [verifyMessage, setVerifyMessage] = useState(false)
   const [showForgotPassword, setShowForgotPassword] = useState(false)
@@ -51,6 +53,17 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setEmailError('')
+    setPasswordError('')
+
+    if (!email.trim()) {
+      setEmailError('Email address is required')
+      return
+    }
+    if (!password) {
+      setPasswordError('Password is required')
+      return
+    }
 
     if (!supabaseReady) {
       setError('Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment.')
@@ -76,14 +89,6 @@ export default function LoginPage() {
         return
       }
 
-      // #region agent log
-      // Check if browser client automatically set cookies
-      const cookiesAfterSignIn = document.cookie.split(';').map(c => c.trim())
-      const supabaseCookies = cookiesAfterSignIn.filter(c => c.startsWith('sb-'))
-      fetch('http://127.0.0.1:7242/ingest/160a94b3-1cf1-4047-acd7-ddbf3ee386d7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/login/page.tsx:53',message:'Cookies after signInWithPassword',data:{allCookiesCount:cookiesAfterSignIn.length,supabaseCookiesCount:supabaseCookies.length,supabaseCookieNames:supabaseCookies.map(c=>c.split('=')[0])},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'C'})}).catch(()=>{});
-      console.log('[DEBUG] Cookies after signInWithPassword:', cookiesAfterSignIn.length, 'total,', supabaseCookies.length, 'Supabase cookies');
-      // #endregion
-
       // Call /api/auth/set-session to sync session to server-side cookies
       // The browser client stores the session, but we need to sync it to HTTP cookies
       // that the server can read via middleware
@@ -101,14 +106,6 @@ export default function LoginPage() {
         setIsLoading(false)
         return
       }
-      
-      // #region agent log
-      // Check cookies after API call
-      const cookiesAfterAPI = document.cookie.split(';').map(c => c.trim())
-      const supabaseCookiesAfterAPI = cookiesAfterAPI.filter(c => c.startsWith('sb-'))
-      fetch('http://127.0.0.1:7242/ingest/160a94b3-1cf1-4047-acd7-ddbf3ee386d7',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/login/page.tsx:75',message:'Cookies after /api/auth/set-session',data:{allCookiesCount:cookiesAfterAPI.length,supabaseCookiesCount:supabaseCookiesAfterAPI.length,supabaseCookieNames:supabaseCookiesAfterAPI.map(c=>c.split('=')[0])},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'C'})}).catch(()=>{});
-      console.log('[DEBUG] Cookies after /api/auth/set-session:', cookiesAfterAPI.length, 'total,', supabaseCookiesAfterAPI.length, 'Supabase cookies');
-      // #endregion
       
       // Small delay to ensure cookies are set before navigation
       await new Promise(resolve => setTimeout(resolve, 100))
@@ -202,15 +199,15 @@ export default function LoginPage() {
                 required
                 aria-required="true"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setEmailError('') }}
                 onInput={(e) => setEmail((e.currentTarget as HTMLInputElement).value)}
-                className={error ? 'input-error' : 'input'}
-                aria-describedby={error ? 'email-error' : undefined}
-                aria-invalid={error ? 'true' : 'false'}
+                className={emailError ? 'input-error' : 'input'}
+                aria-describedby={emailError ? 'email-error' : undefined}
+                aria-invalid={emailError ? 'true' : 'false'}
               />
-              {error && (
-                <p id="email-error" className="mt-1 text-sm text-red-600 sr-only">
-                  {error}
+              {emailError && (
+                <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
+                  {emailError}
                 </p>
               )}
             </div>
@@ -229,9 +226,9 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onInput={(e) => setPassword((e.currentTarget as HTMLInputElement).value)}
-                  className={(error ? 'input-error' : 'input') + ' pr-20'}
-                  aria-describedby={error ? 'password-error' : undefined}
-                  aria-invalid={error ? 'true' : 'false'}
+                  className={(passwordError ? 'input-error' : 'input') + ' pr-20'}
+                  aria-describedby={passwordError ? 'password-error' : undefined}
+                  aria-invalid={passwordError ? 'true' : 'false'}
                 />
                 <button
                   type="button"
@@ -243,9 +240,9 @@ export default function LoginPage() {
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
-              {error && (
-                <p id="password-error" className="mt-1 text-sm text-red-600 sr-only">
-                  {error}
+              {passwordError && (
+                <p id="password-error" className="mt-1 text-sm text-red-600" role="alert">
+                  {passwordError}
                 </p>
               )}
             </div>
