@@ -15,31 +15,21 @@ export default function ResetPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    // createBrowserClient auto-detects the ?code= in the URL and exchanges it.
-    // We wait for the auth state to settle — PASSWORD_RECOVERY fires when
-    // the exchanged session is from a password reset link.
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
-        setStatus('ready')
-      }
-    })
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get('code')
 
-    // Also check if there's already an active session (e.g. page refresh)
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setStatus('ready')
-      }
-    })
-
-    // If nothing happens in 5 seconds, the link was invalid or expired
-    const timer = setTimeout(() => {
-      setStatus((current) => current === 'verifying' ? 'invalid' : current)
-    }, 5000)
-
-    return () => {
-      subscription.unsubscribe()
-      clearTimeout(timer)
+    if (code) {
+      // Explicitly exchange the code — avoids race condition with auto-detection
+      supabaseClient.auth.exchangeCodeForSession(code).then(({ error }) => {
+        setStatus(error ? 'invalid' : 'ready')
+      })
+      return
     }
+
+    // No code in URL — check for an existing session (e.g. page refresh after exchange)
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+      setStatus(session ? 'ready' : 'invalid')
+    })
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
