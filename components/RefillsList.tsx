@@ -112,6 +112,7 @@ export function RefillsList({ rows }: RefillsListProps) {
               onClick={() => toggle(row.id)}
               className="w-full text-left px-4 py-4 flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
               aria-expanded={isOpen}
+              aria-controls={`refill-details-${row.id}`}
             >
               <div className="flex items-center gap-4 min-w-0">
                 <div className="min-w-0">
@@ -127,7 +128,7 @@ export function RefillsList({ rows }: RefillsListProps) {
                 <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${statusColor(currentStatus)}`}>
                   {statusLabel(currentStatus)}
                 </span>
-                <span className="text-xs text-gray-400 hidden sm:block">
+                <span className="text-xs text-gray-500 hidden sm:block">
                   {new Date(row.created_at).toLocaleDateString()}
                 </span>
                 <svg
@@ -142,7 +143,10 @@ export function RefillsList({ rows }: RefillsListProps) {
 
             {/* Expanded client info + status control */}
             {isOpen && (
-              <div className="border-t border-gray-200/60 px-4 py-4 bg-gray-50/60">
+              <div
+                id={`refill-details-${row.id}`}
+                className="border-t border-gray-200/60 px-4 py-4 bg-gray-50/60"
+              >
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Client information</h3>
                 <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
                   <div>
@@ -197,11 +201,11 @@ export function RefillsList({ rows }: RefillsListProps) {
                           ))}
                         </select>
                         {saving[row.id] && (
-                          <span className="text-xs text-gray-400">Saving…</span>
+                          <span className="text-xs text-gray-500" aria-live="polite" role="status">Saving…</span>
                         )}
                       </div>
                       {errors[row.id] && (
-                        <p className="mt-1 text-xs text-red-600">{errors[row.id]}</p>
+                        <p className="mt-1 text-xs text-red-600" role="alert">{errors[row.id]}</p>
                       )}
                     </dd>
                   </div>

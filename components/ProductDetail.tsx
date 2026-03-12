@@ -115,7 +115,7 @@ export function ProductDetail({ product, variants = [], returnTo, isAuthenticate
             <h1 className="text-3xl font-bold mb-4">{titleText}</h1>
             <p className="text-lg text-gray-600 mb-2">{product.category}</p>
             {product.brand && (
-              <p className="text-sm text-gray-500 mb-4">Brand: {product.brand}</p>
+              <p className="text-sm text-gray-600 mb-4">Brand: {product.brand}</p>
             )}
             <p className="text-3xl font-bold text-primary-600 mb-4">{product.price_display}</p>
 

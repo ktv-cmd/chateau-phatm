@@ -91,7 +91,7 @@ export function AdminLiveBar() {
     return (
       <div className="print:hidden flex justify-end px-4 pt-1 pb-0">
         {lastRefreshed && (
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-500">
             Auto-refresh active · last checked {lastRefreshed.toLocaleTimeString()}
           </span>
         )}

@@ -55,7 +55,7 @@ export function OwnerSettings({ email }: OwnerSettingsProps) {
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold mb-2">Settings</h1>
-        <p className="text-gray-500 mb-8">Manage your admin account</p>
+        <p className="text-gray-600 mb-8">Manage your admin account</p>
 
         {/* Account info */}
         <div className="card mb-6">
@@ -68,7 +68,7 @@ export function OwnerSettings({ email }: OwnerSettingsProps) {
             </span>
             <div>
               <p className="text-sm font-medium text-gray-900">{email}</p>
-              <p className="text-xs text-gray-500">Admin</p>
+              <p className="text-xs text-gray-600">Admin</p>
             </div>
           </div>
         </div>
@@ -80,13 +80,13 @@ export function OwnerSettings({ email }: OwnerSettingsProps) {
           </h2>
 
           {success && (
-            <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+            <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700" role="status" aria-live="polite">
               Password updated successfully.
             </div>
           )}
 
           {error && (
-            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div id="settings-error" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
               {error}
             </div>
           )}
@@ -104,6 +104,7 @@ export function OwnerSettings({ email }: OwnerSettingsProps) {
                 type="password"
                 autoComplete="current-password"
                 required
+                aria-required="true"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -122,12 +123,15 @@ export function OwnerSettings({ email }: OwnerSettingsProps) {
                 type="password"
                 autoComplete="new-password"
                 required
+                aria-required="true"
                 minLength={8}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                aria-describedby={error ? 'settings-error' : 'new-password-hint'}
+                aria-invalid={error ? 'true' : 'false'}
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+              <p id="new-password-hint" className="mt-1 text-xs text-gray-600">Minimum 8 characters</p>
             </div>
 
             <div>
@@ -142,9 +146,12 @@ export function OwnerSettings({ email }: OwnerSettingsProps) {
                 type="password"
                 autoComplete="new-password"
                 required
+                aria-required="true"
                 minLength={8}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                aria-describedby={error?.includes('match') ? 'settings-error' : undefined}
+                aria-invalid={error?.includes('match') ? 'true' : 'false'}
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
@@ -154,6 +161,8 @@ export function OwnerSettings({ email }: OwnerSettingsProps) {
                 type="submit"
                 disabled={saving}
                 className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-busy={saving}
+                aria-disabled={saving}
               >
                 {saving ? 'Saving…' : 'Update password'}
               </button>
