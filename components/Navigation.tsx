@@ -227,6 +227,12 @@ export function Navigation() {
                         Products
                       </Link>
                       <Link
+                        href="/refill"
+                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      >
+                        Refill
+                      </Link>
+                      <Link
                         href="/orders"
                         className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
@@ -365,6 +371,13 @@ export function Navigation() {
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Products
+                    </Link>
+                    <Link
+                      href="/refill"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Refill
                     </Link>
                     <Link
                       href="/orders"

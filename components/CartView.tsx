@@ -78,9 +78,14 @@ export function CartView({ cartItems: initialCartItems }: CartViewProps) {
           <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
           <div className="card text-center py-12">
             <p className="text-gray-600 text-lg mb-4">Your cart is empty.</p>
-            <Link href="/products" className="btn-primary inline-block">
-              Browse Products
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/products" className="btn-primary inline-block">
+                Browse Products
+              </Link>
+              <Link href="/refill" className="btn-secondary inline-block">
+                Make a Refill
+              </Link>
+            </div>
           </div>
         </div>
       </div>

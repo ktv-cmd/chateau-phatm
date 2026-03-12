@@ -118,30 +118,34 @@ export default async function HomePage({
               </p>
             </div>
 
-            <form action={submitRefillRequest} className="mt-4 flex flex-col sm:flex-row gap-3">
-              <label htmlFor="refill-number" className="sr-only">
-                Refill number
-              </label>
-              <input
-                id="refill-number"
-                name="refillNumber"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]{6,8}"
-                minLength={6}
-                maxLength={8}
-                required
-                className="input sm:max-w-xs"
-                placeholder="Enter refill number"
-                aria-describedby="refill-helper"
-              />
-              <button type="submit" className="btn-primary px-6">
-                Request refill
-              </button>
-            </form>
-            <p id="refill-helper" className="mt-2 text-xs text-gray-500">
-              Example: 123456
-            </p>
+            {refillStatus !== 'success' && (
+              <>
+                <form action={submitRefillRequest} className="mt-4 flex flex-col sm:flex-row gap-3">
+                  <label htmlFor="refill-number" className="sr-only">
+                    Refill number
+                  </label>
+                  <input
+                    id="refill-number"
+                    name="refillNumber"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]{6,8}"
+                    minLength={6}
+                    maxLength={8}
+                    required
+                    className="input sm:max-w-xs"
+                    placeholder="Enter refill number"
+                    aria-describedby="refill-helper"
+                  />
+                  <button type="submit" className="btn-primary px-6">
+                    Request refill
+                  </button>
+                </form>
+                <p id="refill-helper" className="mt-2 text-xs text-gray-500">
+                  Example: 123456
+                </p>
+              </>
+            )}
 
             {refillStatus === 'success' && (
               <p className="mt-3 text-sm text-green-600">Refill request sent to the pharmacy.</p>

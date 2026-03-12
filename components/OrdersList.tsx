@@ -33,7 +33,17 @@ export function OrdersList({ orders, isOwner }: OrdersListProps) {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-8">{isOwner ? 'Orders' : 'My Orders'}</h1>
           <div className="card text-center py-12">
-            <p className="text-gray-600 text-lg">No orders found.</p>
+            <p className="text-gray-600 text-lg mb-4">No orders found.</p>
+            {!isOwner && (
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link href="/products" className="btn-primary inline-block">
+                  Browse Products
+                </Link>
+                <Link href="/refill" className="btn-secondary inline-block">
+                  Make a Refill
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
