@@ -297,13 +297,9 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                       : 'block mb-3 sm:mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-1'
                   }
                 >
-                  <div className={isSearchMode ? 'flex gap-3 sm:flex-col sm:gap-2' : 'flex flex-col gap-2'}>
+                  <div className="flex gap-3 sm:flex-col sm:gap-2">
                     <div
-                      className={
-                        isSearchMode
-                          ? 'w-5/12 sm:w-full aspect-square sm:aspect-auto sm:h-48 rounded bg-white overflow-hidden relative'
-                          : 'w-full aspect-square sm:aspect-auto sm:h-48 rounded bg-white overflow-hidden relative'
-                      }
+                      className="w-5/12 sm:w-full aspect-square sm:aspect-auto sm:h-48 rounded bg-white overflow-hidden relative"
                       aria-hidden={selectedVariant.image_url ? undefined : 'true'}
                       role={selectedVariant.image_url ? undefined : 'img'}
                       aria-label={
@@ -323,7 +319,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                         </div>
                       )}
                     </div>
-                    <div className={isSearchMode ? 'w-7/12 sm:w-full flex flex-col gap-2' : 'flex flex-col gap-2'}>
+                    <div className="w-7/12 sm:w-full flex flex-col gap-2">
                       <h2 className="text-base sm:text-xl font-semibold line-clamp-2 leading-5 sm:leading-6 min-h-[2.5rem] sm:h-12">
                         {titleText}
                       </h2>
