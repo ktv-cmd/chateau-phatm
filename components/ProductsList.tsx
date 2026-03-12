@@ -20,6 +20,7 @@ interface ProductsListProps {
   searchQuery?: string
   /** Hide the inline search bar when a nav-level search input is already present */
   hideSearch?: boolean
+  isAdmin?: boolean
 }
 
 // Group products by base name and sort variants
@@ -59,7 +60,7 @@ function groupProductVariants(products: Product[]): ProductWithVariants[] {
   return Object.values(groups)
 }
 
-export function ProductsList({ products, categories, selectedCategory, searchQuery: initialSearchQuery, hideSearch = false }: ProductsListProps) {
+export function ProductsList({ products, categories, selectedCategory, searchQuery: initialSearchQuery, hideSearch = false, isAdmin = false }: ProductsListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isUpdating, setIsUpdating] = useState<string | null>(null)
@@ -72,7 +73,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
   const isSearchMode = Boolean(searchParams?.get('search'))
 
   useEffect(() => {
-    loadCart()
+    if (!isAdmin) loadCart()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -381,52 +382,54 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                 </div>
 
               {/* Quick add controls (Instacart-style) */}
-                <div className="min-h-[44px]">
-                  {selectedVariant.in_stock ? (
-                    cartByProduct[selectedVariant.id] ? (
-                      <div className="flex items-center justify-between gap-3">
-                        <button
-                          type="button"
-                          onClick={() => decrement(selectedVariant.id)}
-                          disabled={isUpdating === selectedVariant.id}
-                          className="btn-secondary w-12"
-                          aria-label={`Decrease quantity of ${selectedVariant.name}`}
-                          aria-busy={isUpdating === selectedVariant.id}
-                        >
-                          −
-                        </button>
-                        <div className="text-sm font-semibold text-gray-900 tabular-nums">
-                          {cartByProduct[selectedVariant.id]?.qty}
+                {!isAdmin && (
+                  <div className="min-h-[44px]">
+                    {selectedVariant.in_stock ? (
+                      cartByProduct[selectedVariant.id] ? (
+                        <div className="flex items-center justify-between gap-3">
+                          <button
+                            type="button"
+                            onClick={() => decrement(selectedVariant.id)}
+                            disabled={isUpdating === selectedVariant.id}
+                            className="btn-secondary w-12"
+                            aria-label={`Decrease quantity of ${selectedVariant.name}`}
+                            aria-busy={isUpdating === selectedVariant.id}
+                          >
+                            −
+                          </button>
+                          <div className="text-sm font-semibold text-gray-900 tabular-nums">
+                            {cartByProduct[selectedVariant.id]?.qty}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => increment(selectedVariant.id)}
+                            disabled={isUpdating === selectedVariant.id}
+                            className="btn-primary w-12"
+                            aria-label={`Increase quantity of ${selectedVariant.name}`}
+                            aria-busy={isUpdating === selectedVariant.id}
+                          >
+                            +
+                          </button>
                         </div>
+                      ) : (
                         <button
                           type="button"
                           onClick={() => increment(selectedVariant.id)}
                           disabled={isUpdating === selectedVariant.id}
-                          className="btn-primary w-12"
-                          aria-label={`Increase quantity of ${selectedVariant.name}`}
+                          className="btn-primary w-full"
+                          aria-label={`Add ${selectedVariant.name} to cart`}
                           aria-busy={isUpdating === selectedVariant.id}
                         >
-                          +
+                          {isUpdating === selectedVariant.id ? 'Adding...' : 'Add'}
                         </button>
-                      </div>
+                      )
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => increment(selectedVariant.id)}
-                        disabled={isUpdating === selectedVariant.id}
-                        className="btn-primary w-full"
-                        aria-label={`Add ${selectedVariant.name} to cart`}
-                        aria-busy={isUpdating === selectedVariant.id}
-                      >
-                        {isUpdating === selectedVariant.id ? 'Adding...' : 'Add'}
+                      <button type="button" disabled className="btn-secondary w-full" aria-disabled="true">
+                        Out of stock
                       </button>
-                    )
-                  ) : (
-                    <button type="button" disabled className="btn-secondary w-full" aria-disabled="true">
-                      Out of stock
-                    </button>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
             </article>
             )
@@ -435,7 +438,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
       )}
 
       {/* Sticky mini-cart (mobile-first) */}
-      {totalItems > 0 && (
+      {!isAdmin && totalItems > 0 && (
         <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden">
           <Link
             href="/cart"

@@ -12,11 +12,12 @@ interface ProductDetailProps {
   variants?: Product[]
   returnTo?: string | null
   isAuthenticated?: boolean
+  isAdmin?: boolean
 }
 
 const DEFAULT_DESCRIPTION = 'Quality healthcare product for home use.'
 
-export function ProductDetail({ product, variants = [], returnTo, isAuthenticated = false }: ProductDetailProps) {
+export function ProductDetail({ product, variants = [], returnTo, isAuthenticated = false, isAdmin = false }: ProductDetailProps) {
   const router = useRouter()
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
@@ -146,7 +147,7 @@ export function ProductDetail({ product, variants = [], returnTo, isAuthenticate
               <p className="text-gray-700">{descriptionText}</p>
             </div>
 
-            {!isAuthenticated ? (
+            {isAdmin ? null : !isAuthenticated ? (
               <div className="rounded-2xl border border-primary-100 bg-primary-50/60 px-5 py-4 space-y-3">
                 <p className="text-sm text-gray-700">
                   <span className="font-semibold">Want to order this product?</span> Create a free account or log in to add it to your cart.

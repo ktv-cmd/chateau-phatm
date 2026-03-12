@@ -42,5 +42,5 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
 
   const variants = await getProductVariants(serverSupabase, product)
 
-  return <ProductDetail product={product} variants={variants} returnTo={searchParams?.returnTo} isAuthenticated={!!user} />
+  return <ProductDetail product={product} variants={variants} returnTo={searchParams?.returnTo} isAuthenticated={!!user} isAdmin={isAdmin(user?.email)} />
 }

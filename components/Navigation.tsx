@@ -395,13 +395,15 @@ export function Navigation() {
                     </Link>
                   </>
                 )}
-                <Link
-                  href="/cart"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Cart {cartCount > 0 && `(${cartCount})`}
-                </Link>
+                {!isAdmin(user.email) && (
+                  <Link
+                    href="/cart"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Cart {cartCount > 0 && `(${cartCount})`}
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     setIsMenuOpen(false)

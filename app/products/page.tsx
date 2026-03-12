@@ -4,12 +4,16 @@ import { listProducts, listProductCategories } from '@/lib/db/products'
 import { logger } from '@/lib/logger'
 import { ProductsList } from '@/components/ProductsList'
 import { redirect } from 'next/navigation'
+import { getCurrentUser } from '@/lib/auth-server'
+import { isAdmin } from '@/lib/roles'
 
 interface ProductsPageProps {
   searchParams: { category?: string; search?: string; welcome?: string }
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const user = await getCurrentUser()
+  const userIsAdmin = isAdmin(user?.email)
   const serverSupabase = await supabaseServerClient()
 
   const { data: products, error } = await listProducts(serverSupabase, {
@@ -32,9 +36,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <h1 className="text-3xl font-bold tracking-tight">Shop</h1>
             <p className="mt-1 text-gray-600">Search, filter by category, then add items to your cart.</p>
           </div>
-          <div className="hidden md:block">
-            <a href="/cart" className="btn-secondary">View cart</a>
-          </div>
+          {!userIsAdmin && (
+            <div className="hidden md:block">
+              <a href="/cart" className="btn-secondary">View cart</a>
+            </div>
+          )}
         </div>
 
         {searchParams.welcome === 'true' && (
@@ -56,6 +62,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             selectedCategory={searchParams.category}
             searchQuery={searchParams.search}
             hideSearch
+            isAdmin={userIsAdmin}
           />
         </Suspense>
       </div>
