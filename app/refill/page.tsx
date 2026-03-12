@@ -94,17 +94,17 @@ export default async function RefillPage({
           ) : null}
 
           {status === 'success' && (
-            <p className="text-sm text-green-600 font-medium">
+            <p className="text-sm text-green-600 font-medium" role="status" aria-live="polite">
               Refill request sent to the pharmacy.
             </p>
           )}
           {status === 'invalid' && (
-            <p className="mt-3 text-sm text-red-600">
+            <p className="mt-3 text-sm text-red-600" role="alert">
               Please enter a valid 6–8 digit refill number.
             </p>
           )}
           {status === 'error' && (
-            <p className="mt-3 text-sm text-red-600">
+            <p className="mt-3 text-sm text-red-600" role="alert">
               We could not submit your request. Please try again.
             </p>
           )}

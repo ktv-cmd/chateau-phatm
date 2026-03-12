@@ -105,7 +105,7 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
         {success && (
           <div
             className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4"
-            role="alert"
+            role="status"
             aria-live="polite"
           >
             Profile updated successfully!
@@ -131,6 +131,7 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
               <input
                 id="firstName"
                 type="text"
+                autoComplete="given-name"
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 className="input"
@@ -141,6 +142,7 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
               <input
                 id="lastName"
                 type="text"
+                autoComplete="family-name"
                 value={formData.lastName}
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 className="input"
@@ -153,6 +155,7 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
             <input
               id="phone"
               type="tel"
+              autoComplete="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               className="input"
@@ -164,6 +167,7 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
             <input
               id="addressLine1"
               type="text"
+              autoComplete="street-address"
               value={formData.addressLine1}
               onChange={(e) => setFormData({ ...formData, addressLine1: e.target.value })}
               className="input"
@@ -175,6 +179,7 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
             <input
               id="addressLine2"
               type="text"
+              autoComplete="address-line2"
               value={formData.addressLine2}
               onChange={(e) => setFormData({ ...formData, addressLine2: e.target.value })}
               className="input"
@@ -187,6 +192,7 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
               <input
                 id="city"
                 type="text"
+                autoComplete="address-level2"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                 className="input"
@@ -198,6 +204,8 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
                 id="state"
                 type="text"
                 maxLength={2}
+                autoComplete="address-level1"
+                aria-label="State (2-letter abbreviation)"
                 value={formData.state}
                 onChange={(e) => setFormData({ ...formData, state: e.target.value.toUpperCase() })}
                 className="input"
@@ -210,6 +218,7 @@ export function ProfileForm({ profile, showWelcome = false }: ProfileFormProps) 
             <input
               id="zip"
               type="text"
+              autoComplete="postal-code"
               value={formData.zip}
               onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
               className="input"

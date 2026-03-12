@@ -95,13 +95,13 @@ export default function ResetPasswordPage() {
 
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">Reset your password</h1>
-          <p className="mt-1 text-sm text-gray-500">Chateau Drug &amp; Homecare</p>
+          <p className="mt-1 text-sm text-gray-600">Chateau Drug &amp; Homecare</p>
         </div>
 
         {status === 'verifying' && (
           <div className="text-center py-6">
             <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-primary-600 border-t-transparent" aria-hidden="true" />
-            <p className="mt-3 text-sm text-gray-500">Verifying your reset link…</p>
+            <p className="mt-3 text-sm text-gray-600">Verifying your reset link…</p>
           </div>
         )}
 
@@ -128,7 +128,7 @@ export default function ResetPasswordPage() {
             <p className="text-sm text-gray-600">Enter a new password for your account.</p>
 
             {error && (
-              <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700" role="alert">
+              <div id="reset-error" className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700" role="alert">
                 {error}
               </div>
             )}
@@ -146,6 +146,8 @@ export default function ResetPasswordPage() {
                   className="input pr-20"
                   placeholder="At least 6 characters"
                   autoComplete="new-password"
+                  aria-invalid={error ? 'true' : 'false'}
+                  aria-describedby={error ? 'reset-error' : undefined}
                 />
                 <button
                   type="button"
@@ -169,6 +171,8 @@ export default function ResetPasswordPage() {
                 className="input"
                 placeholder="Repeat new password"
                 autoComplete="new-password"
+                aria-invalid={error?.includes('match') ? 'true' : 'false'}
+                aria-describedby={error?.includes('match') ? 'reset-error' : undefined}
               />
             </div>
 

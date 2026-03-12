@@ -309,6 +309,8 @@ export default function LoginPage() {
                     id="forgot-email"
                     type="email"
                     required
+                    aria-required="true"
+                    autoComplete="email"
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
                     className="input"
