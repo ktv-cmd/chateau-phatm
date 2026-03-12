@@ -1,14 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabaseClient } from '@/lib/db/supabaseClient'
 
 type Status = 'verifying' | 'ready' | 'success' | 'invalid'
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams()
   const [status, setStatus] = useState<Status>('verifying')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -17,40 +15,12 @@ export default function ResetPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    const tokenHash = searchParams.get('token_hash')
-    const type = searchParams.get('type')
-
-    if (tokenHash && type === 'recovery') {
-      // PKCE flow: exchange the token hash for a session
-      supabaseClient.auth
-        .verifyOtp({ token_hash: tokenHash, type: 'recovery' })
-        .then(({ error }) => {
-          if (error) {
-            setStatus('invalid')
-          } else {
-            setStatus('ready')
-          }
-        })
-      return
-    }
-
-    // Implicit flow fallback: wait for PASSWORD_RECOVERY event from hash fragment
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setStatus('ready')
-      }
+    // The /auth/callback route already exchanged the code and set the session.
+    // If there's a valid session here, the user arrived via a genuine reset link.
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+      setStatus(session ? 'ready' : 'invalid')
     })
-
-    // If no token and no event within 3s, the link is invalid
-    const timer = setTimeout(() => {
-      setStatus('invalid')
-    }, 3000)
-
-    return () => {
-      subscription.unsubscribe()
-      clearTimeout(timer)
-    }
-  }, [searchParams])
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -71,6 +41,8 @@ export default function ResetPasswordPage() {
       setError(updateError.message)
       setIsSubmitting(false)
     } else {
+      // Sign out so the user logs in fresh with the new password
+      await supabaseClient.auth.signOut()
       setStatus('success')
     }
   }
@@ -94,7 +66,7 @@ export default function ResetPasswordPage() {
         {status === 'invalid' && (
           <div className="space-y-4">
             <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-4" role="alert">
-              <p className="font-medium text-red-800 text-sm">Link expired or invalid</p>
+              <p className="font-medium text-red-800 text-sm">Link expired or already used</p>
               <p className="mt-1 text-sm text-red-700">
                 Password reset links expire after 1 hour and can only be used once.
                 Please request a new one.

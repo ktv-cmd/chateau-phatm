@@ -37,7 +37,7 @@ export default function LoginPage() {
     setForgotLoading(true)
     try {
       await supabaseClient.auth.resetPasswordForEmail(forgotEmail.trim(), {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
       })
       setForgotSent(true)
     } catch {
