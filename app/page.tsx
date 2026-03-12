@@ -83,7 +83,7 @@ export default async function HomePage({
         <section className="page-content pb-6 hidden sm:block" aria-label="Shop by category">
           <div className="flex items-center justify-end sm:justify-between gap-4">
             <h2 className="hidden sm:block text-lg font-semibold text-gray-900">Shop by category</h2>
-            <Link href="/products" className="text-sm font-medium text-primary-700 hover:text-primary-800">
+            <Link href="/products" className="text-sm font-medium text-primary-700 hover:text-primary-800" aria-label="View all products">
               View all
             </Link>
           </div>
@@ -154,15 +154,15 @@ export default async function HomePage({
             )}
 
             {refillStatus === 'success' && (
-              <p className="mt-3 text-sm text-green-600">Refill request sent to the pharmacy.</p>
+              <p className="mt-3 text-sm text-green-600" role="status" aria-live="polite">Refill request sent to the pharmacy.</p>
             )}
             {refillStatus === 'invalid' && (
-              <p className="mt-3 text-sm text-red-600">
+              <p className="mt-3 text-sm text-red-600" role="alert">
                 Please enter a valid 6–8 digit refill number.
               </p>
             )}
             {refillStatus === 'error' && (
-              <p className="mt-3 text-sm text-red-600">
+              <p className="mt-3 text-sm text-red-600" role="alert">
                 We could not submit your request. Please try again.
               </p>
             )}
@@ -191,6 +191,7 @@ export default async function HomePage({
               <Link
                 href={`/products?category=${encodeURIComponent(category)}`}
                 className="text-sm font-medium text-primary-700 hover:text-primary-800"
+                aria-label={`View all ${category} products`}
               >
                 View all
               </Link>
@@ -240,7 +241,7 @@ export default async function HomePage({
                           <p className="text-xs sm:text-sm text-gray-600 line-clamp-1">
                             {product.category}
                           </p>
-                          <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">
+                          <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
                             {description}
                           </p>
                           <p className="text-sm font-semibold text-primary-600">

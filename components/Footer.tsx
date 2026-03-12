@@ -70,7 +70,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-gray-200/60 text-center text-sm text-gray-500">
+        <div className="mt-8 pt-6 border-t border-gray-200/60 text-center text-sm text-gray-600">
           <p>&copy; {new Date().getFullYear()} Chateau Drug & Homecare. All rights reserved.</p>
         </div>
       </div>

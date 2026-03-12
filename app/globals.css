@@ -223,19 +223,7 @@
   border-color: #dc2626;
 }
 
-/* Live regions for screen readers */
-[aria-live] {
-  position: absolute;
-  left: -10000px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-}
-
-[aria-live]:not([aria-live="off"]) {
-  position: static;
-  left: auto;
-  width: auto;
-  height: auto;
-  overflow: visible;
-}
+/* Live regions for screen readers.
+   NOTE: Do NOT use CSS to hide/show aria-live regions.
+   The sr-only class already keeps elements accessible to AT while visually hidden.
+   Overriding sr-only or absolute positioning here would break layout. */

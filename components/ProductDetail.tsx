@@ -79,7 +79,7 @@ export function ProductDetail({ product, variants = [], returnTo, isAuthenticate
           <ol className="flex space-x-2 text-sm text-gray-600">
             <li><Link href="/products" className="hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">Products</Link></li>
             <li aria-hidden="true">/</li>
-            <li className="text-gray-900">{titleText}</li>
+            <li aria-current="page" className="text-gray-900">{titleText}</li>
           </ol>
         </nav>
 
@@ -95,7 +95,7 @@ export function ProductDetail({ product, variants = [], returnTo, isAuthenticate
                 <img
                   src={product.image_url}
                   alt={`${titleText}${sizeBadgeText ? ` (${sizeBadgeText})` : ''} - ${product.category}${product.brand ? ` by ${product.brand}` : ''}`}
-                  className="w-full h-full object-contain transition-transform duration-300 ease-out group-hover:scale-125 group-hover:cursor-zoom-in"
+                  className="w-full h-full object-contain transition-transform duration-300 ease-out group-hover:scale-125 group-hover:cursor-zoom-in group-focus-within:scale-110"
                   loading="lazy"
                 />
               </div>
@@ -211,7 +211,7 @@ export function ProductDetail({ product, variants = [], returnTo, isAuthenticate
                 </button>
               </div>
             ) : (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded" role="status" aria-live="polite">
                 <p>This product is currently out of stock.</p>
               </div>
             )}

@@ -290,6 +290,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
               >
                 <Link
                   href={`/products/${selectedVariant.id}?returnTo=${encodeURIComponent(returnTo)}`}
+                  aria-label={`${titleText}${sizeBadgeText ? ` (${sizeBadgeText})` : ''}, ${selectedVariant.category}, ${selectedVariant.price_display}, ${selectedVariant.in_stock ? 'In stock' : 'Out of stock'}`}
                   className={
                     isSearchMode
                       ? 'block mb-3 sm:mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded flex-1'
@@ -310,12 +311,12 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                       }
                     >
                       {selectedVariant.image_url ? (
-                        <img
-                          src={selectedVariant.image_url}
-                          alt={`${baseName}${!hasMultipleVariants && sizeBadgeText ? ` (${sizeBadgeText})` : ''} - ${selectedVariant.category}`}
-                          className="w-full h-full object-contain transition-transform duration-300 ease-out group-hover:scale-110 group-hover:cursor-zoom-in"
-                          loading="lazy"
-                        />
+                          <img
+                            src={selectedVariant.image_url}
+                            alt={`${baseName}${!hasMultipleVariants && sizeBadgeText ? ` (${sizeBadgeText})` : ''} - ${selectedVariant.category}`}
+                            className="w-full h-full object-contain transition-transform duration-300 ease-out group-hover:scale-110 group-hover:cursor-zoom-in group-focus-within:scale-105"
+                            loading="lazy"
+                          />
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                           <span className="text-gray-400 sr-only">No image available</span>
@@ -335,7 +336,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                       >
                         {selectedVariant.category}
                       </p>
-                      <p className="text-xs sm:text-sm text-gray-500 line-clamp-2 leading-4 sm:leading-5 min-h-[2rem] sm:h-10">
+                      <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-4 sm:leading-5 min-h-[2rem] sm:h-10">
                         {detailText}
                       </p>
                       <p className="text-xs sm:text-sm leading-4 sm:leading-5 h-4 sm:h-5">
@@ -358,14 +359,13 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                   {hasMultipleVariants ? (
                     <>
                       <label htmlFor={`size-${baseName}`} className="sr-only">
-                        Option
+                        Select size or option for {baseName}
                       </label>
                       <select
                         id={`size-${baseName}`}
                         value={selectedVariantId}
                         onChange={(e) => setSelectedVariants((prev) => ({ ...prev, [baseName]: e.target.value }))}
                         className="input text-xs sm:text-sm h-9 sm:h-10 w-full sm:w-auto sm:min-w-[8rem] sm:max-w-[12rem]"
-                        aria-label={`Select option for ${baseName}`}
                       >
                         {variants.map((variant) => (
                           <option key={variant.id} value={variant.id}>
@@ -402,9 +402,14 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
                           >
                             −
                           </button>
-                          <div className="text-sm font-semibold text-gray-900 tabular-nums">
+                          <output
+                            aria-live="polite"
+                            aria-atomic="true"
+                            aria-label={`Quantity: ${cartByProduct[selectedVariant.id]?.qty}`}
+                            className="text-sm font-semibold text-gray-900 tabular-nums min-w-[1.5rem] text-center"
+                          >
                             {cartByProduct[selectedVariant.id]?.qty}
-                          </div>
+                          </output>
                           <button
                             type="button"
                             onClick={() => increment(selectedVariant.id)}

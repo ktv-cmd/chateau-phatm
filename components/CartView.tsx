@@ -157,7 +157,7 @@ export function CartView({ cartItems: initialCartItems }: CartViewProps) {
                     onClick={() => updateQuantity(item.id, item.qty - 1)}
                     disabled={isUpdating === item.id || item.qty <= 1}
                     className="btn-secondary w-9"
-                    aria-label="Decrease quantity"
+                    aria-label={`Decrease quantity of ${item.product?.name || 'item'}`}
                     aria-disabled={isUpdating === item.id || item.qty <= 1}
                   >
                     -
@@ -177,7 +177,7 @@ export function CartView({ cartItems: initialCartItems }: CartViewProps) {
                     onClick={() => updateQuantity(item.id, item.qty + 1)}
                     disabled={isUpdating === item.id}
                     className="btn-secondary w-9"
-                    aria-label="Increase quantity"
+                    aria-label={`Increase quantity of ${item.product?.name || 'item'}`}
                     aria-disabled={isUpdating === item.id}
                   >
                     +

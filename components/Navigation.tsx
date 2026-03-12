@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { SearchAutocomplete } from '@/components/SearchAutocomplete'
 import { SafetyBanner } from '@/components/SafetyBanner'
@@ -23,11 +23,58 @@ export function Navigation() {
   const [sessionSynced, setSessionSynced] = useState(false)
   const [searchValue, setSearchValue] = useState(searchParams.get('search') ?? '')
   const [safetyWarnings, setSafetyWarnings] = useState<SearchSafetyWarning[]>([])
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
 
   // Keep search input in sync when URL search param changes (e.g. back/forward navigation)
   useEffect(() => {
     setSearchValue(searchParams.get('search') ?? '')
   }, [searchParams])
+
+  // Mobile menu: focus management, focus trap, and Escape key
+  useEffect(() => {
+    if (!isMenuOpen) return
+
+    // Move focus to first focusable element in the menu
+    const focusable = mobileMenuRef.current?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable && focusable.length > 0) {
+      setTimeout(() => focusable[0].focus(), 50)
+    }
+
+    // Focus trap
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setIsMenuOpen(false)
+        menuButtonRef.current?.focus()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const items = Array.from(
+        mobileMenuRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        ) ?? []
+      )
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isMenuOpen])
 
   useEffect(() => {
     loadUser()
@@ -177,10 +224,10 @@ export function Navigation() {
                 <span className="flex items-center gap-2">
                   <img
                     src="/assets/chateau-logo.png"
-                    alt="Chateau Drug & Homecare logo"
+                    alt=""
                     className="h-8 w-auto"
                   />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">
+                <span className="text-primary-700">
                   Chateau Drug & Homecare
                   </span>
                 </span>
@@ -326,7 +373,11 @@ export function Navigation() {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div
+          ref={mobileMenuRef}
           id="mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
           className="md:hidden fixed bottom-0 left-0 right-0 z-40 rounded-t-2xl border border-gray-200/60 bg-white/95 backdrop-blur shadow-2xl"
         >
           <div className="px-3 pt-3 pb-14 space-y-1 max-h-[60vh] overflow-y-auto">
@@ -515,6 +566,7 @@ export function Navigation() {
           /* Customer bottom nav */
           <div className="grid grid-cols-5 py-1">
             <button
+              ref={menuButtonRef}
               type="button"
               onClick={() => setIsMenuOpen((open) => !open)}
               className={`flex flex-col items-center justify-center gap-0.5 rounded-md px-2 py-1.5 text-[11px] font-medium leading-4 transition-colors ${
@@ -572,7 +624,7 @@ export function Navigation() {
               </svg>
               Cart
               {cartCount > 0 && (
-                <span className="absolute top-0.5 right-5 bg-primary-600 text-white text-[10px] rounded-full h-4 min-w-[1rem] flex items-center justify-center px-1">
+                <span className="absolute top-0.5 right-5 bg-primary-600 text-white text-[10px] rounded-full h-4 min-w-[1rem] flex items-center justify-center px-1" aria-hidden="true">
                   {cartCount}
                 </span>
               )}

@@ -17,6 +17,7 @@ export default function SignupPage() {
   const [needsVerification, setNeedsVerification] = useState(false)
   const [emailError, setEmailError] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [confirmPasswordError, setConfirmPasswordError] = useState('')
   const supabaseReady = isSupabaseConfigured()
 
   useEffect(() => {
@@ -60,6 +61,7 @@ export default function SignupPage() {
     // Clear previous errors
     setEmailError('')
     setPasswordError('')
+    setConfirmPasswordError('')
 
     // Validate fields
     if (!email.trim()) {
@@ -91,7 +93,7 @@ export default function SignupPage() {
 
     if (password !== confirmPassword) {
       setError('Passwords do not match')
-      setPasswordError('Passwords do not match')
+      setConfirmPasswordError('Passwords do not match')
       return
     }
 
@@ -239,14 +241,14 @@ export default function SignupPage() {
                 }}
                 onInput={(e) => setEmail((e.currentTarget as HTMLInputElement).value)}
                 onBlur={(e) => validateEmail(e.target.value)}
-                className={(error || emailError) ? 'input-error' : 'input'}
-                aria-describedby={(error || emailError) ? 'email-error' : undefined}
-                aria-invalid={(error || emailError) ? 'true' : 'false'}
+                className={emailError ? 'input-error' : 'input'}
+                aria-describedby={emailError ? 'email-error' : undefined}
+                aria-invalid={emailError ? 'true' : 'false'}
                 placeholder="your.email@example.com"
               />
-              {(error || emailError) && (
-                <p id="email-error" className="mt-1 text-sm text-red-600">
-                  {emailError || error}
+              {emailError && (
+                <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
+                  {emailError}
                 </p>
               )}
             </div>
@@ -269,9 +271,9 @@ export default function SignupPage() {
                   }}
                   onInput={(e) => setPassword((e.currentTarget as HTMLInputElement).value)}
                   onBlur={(e) => validatePassword(e.target.value)}
-                  className={(error || passwordError) ? 'input-error pr-20' : 'input pr-20'}
-                  aria-describedby={(error || passwordError) ? 'password-error' : undefined}
-                  aria-invalid={(error || passwordError) ? 'true' : 'false'}
+                className={passwordError ? 'input-error pr-20' : 'input pr-20'}
+                aria-describedby={passwordError ? 'password-error' : undefined}
+                aria-invalid={passwordError ? 'true' : 'false'}
                   placeholder="Enter your password"
                 />
                 <button
@@ -290,8 +292,8 @@ export default function SignupPage() {
                 </p>
               )}
               {!passwordError && password && password.length >= 8 && (
-                <p className="mt-1 text-sm text-green-600">
-                  ✓ Password looks good
+                <p className="mt-1 text-sm text-green-600" role="status" aria-live="polite">
+                  Password strength: good
                 </p>
               )}
               {!passwordError && !password && (
@@ -315,9 +317,9 @@ export default function SignupPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   onInput={(e) => setConfirmPassword((e.currentTarget as HTMLInputElement).value)}
-                  className={(error ? 'input-error' : 'input') + ' pr-20'}
-                  aria-describedby={error ? 'confirm-password-error' : undefined}
-                  aria-invalid={error ? 'true' : 'false'}
+                  className={(confirmPasswordError ? 'input-error' : 'input') + ' pr-20'}
+                  aria-describedby={confirmPasswordError ? 'confirm-password-error' : undefined}
+                  aria-invalid={confirmPasswordError ? 'true' : 'false'}
                 />
                 <button
                   type="button"
@@ -329,9 +331,9 @@ export default function SignupPage() {
                   {showConfirmPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
-              {error && (
-                <p id="confirm-password-error" className="mt-1 text-sm text-red-600 sr-only">
-                  {error}
+              {confirmPasswordError && (
+                <p id="confirm-password-error" className="mt-1 text-sm text-red-600" role="alert">
+                  {confirmPasswordError}
                 </p>
               )}
             </div>
