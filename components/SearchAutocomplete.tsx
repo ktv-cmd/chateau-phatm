@@ -95,6 +95,19 @@ export function SearchAutocomplete({
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') {
+      setIsOpen(false)
+      if (highlightIndex >= 0 && highlightIndex < suggestions.length) {
+        event.preventDefault()
+        handleSelect(suggestions[highlightIndex])
+      } else {
+        event.preventDefault()
+        ;(event.target as HTMLInputElement).blur()
+        onSubmit()
+      }
+      return
+    }
+
     if (!suggestions.length) return
 
     if (event.key === 'ArrowDown') {
@@ -106,12 +119,6 @@ export function SearchAutocomplete({
       event.preventDefault()
       setIsOpen(true)
       setHighlightIndex((prev) => (prev - 1 + suggestions.length) % suggestions.length)
-    }
-    if (event.key === 'Enter') {
-      if (highlightIndex >= 0 && highlightIndex < suggestions.length) {
-        event.preventDefault()
-        handleSelect(suggestions[highlightIndex])
-      }
     }
     if (event.key === 'Escape') {
       setIsOpen(false)
