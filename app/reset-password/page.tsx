@@ -8,6 +8,7 @@ type Status = 'verifying' | 'ready' | 'success' | 'invalid'
 
 export default function ResetPasswordPage() {
   const [status, setStatus] = useState<Status>('verifying')
+  const [debugInfo, setDebugInfo] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -17,17 +18,45 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const code = params.get('code')
+    const tokenHash = params.get('token_hash')
+    const type = params.get('type')
+    const errorParam = params.get('error')
+    const errorDesc = params.get('error_description')
+
+    // Supabase sent an error in the URL itself
+    if (errorParam) {
+      setDebugInfo(`URL error: ${errorParam} — ${errorDesc}`)
+      setStatus('invalid')
+      return
+    }
 
     if (code) {
-      // Explicitly exchange the code — avoids race condition with auto-detection
       supabaseClient.auth.exchangeCodeForSession(code).then(({ error }) => {
-        setStatus(error ? 'invalid' : 'ready')
+        if (error) {
+          setDebugInfo(`exchangeCodeForSession failed: ${error.message}`)
+          setStatus('invalid')
+        } else {
+          setStatus('ready')
+        }
       })
       return
     }
 
-    // No code in URL — check for an existing session (e.g. page refresh after exchange)
+    if (tokenHash && type === 'recovery') {
+      supabaseClient.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error }) => {
+        if (error) {
+          setDebugInfo(`verifyOtp failed: ${error.message}`)
+          setStatus('invalid')
+        } else {
+          setStatus('ready')
+        }
+      })
+      return
+    }
+
+    // No code or token in URL — check for existing session
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
+      if (!session) setDebugInfo('No code, token_hash, or active session found in URL')
       setStatus(session ? 'ready' : 'invalid')
     })
   }, [])
@@ -80,6 +109,9 @@ export default function ResetPasswordPage() {
                 Password reset links expire after 1 hour and can only be used once.
                 Please request a new one from the login page.
               </p>
+              {debugInfo && (
+                <p className="mt-2 text-xs text-red-500 font-mono break-all">{debugInfo}</p>
+              )}
             </div>
             <Link href="/login" className="btn-primary w-full text-center block">
               Back to Log In
