@@ -134,6 +134,7 @@ export function SearchAutocomplete({
       <input
         id={id}
         type="text"
+        role="combobox"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
@@ -142,6 +143,7 @@ export function SearchAutocomplete({
         aria-autocomplete="list"
         aria-expanded={isOpen}
         aria-controls={`${id}-listbox`}
+        aria-haspopup="listbox"
         aria-activedescendant={highlightIndex >= 0 ? `${id}-option-${highlightIndex}` : undefined}
         onFocus={() => {
           isFocusedRef.current = true

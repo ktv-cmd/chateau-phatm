@@ -53,18 +53,27 @@ export default async function HomePage({
   const { data: categories } = await listProductCategories(serverSupabase)
 
   const featuredCategories = (categories || []).slice(0, 6)
-  const categoryGroups = await Promise.all(
-    featuredCategories.map(async (category) => {
-      const { data } = await serverSupabase
+
+  const { data: featuredProducts } = featuredCategories.length > 0
+    ? await serverSupabase
         .from('products')
         .select('*')
-        .eq('category', category)
+        .in('category', featuredCategories)
         .eq('is_active', true)
         .order('name')
-        .limit(6)
-      return { category, products: (data as Product[]) || [] }
-    })
+    : { data: [] }
+
+  const productsByCategory = new Map<string, Product[]>(
+    featuredCategories.map((cat) => [cat, []])
   )
+  for (const product of (featuredProducts as Product[]) || []) {
+    const group = productsByCategory.get(product.category)
+    if (group && group.length < 6) group.push(product)
+  }
+  const categoryGroups = featuredCategories.map((category) => ({
+    category,
+    products: productsByCategory.get(category) || [],
+  }))
 
   return (
     <div className="page">
@@ -244,7 +253,7 @@ export default async function HomePage({
                           <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
                             {description}
                           </p>
-                          <p className="text-sm font-semibold text-primary-600">
+                          <p className="text-sm font-semibold text-primary-700">
                             {product.price_display}
                           </p>
                         </div>

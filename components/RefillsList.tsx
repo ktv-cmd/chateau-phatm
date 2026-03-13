@@ -157,7 +157,7 @@ export function RefillsList({ rows }: RefillsListProps) {
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</dt>
                     <dd className="mt-0.5">
                       {client?.email ? (
-                        <a href={`mailto:${client.email}`} className="text-primary-600 hover:underline">
+                        <a href={`mailto:${client.email}`} className="text-primary-700 hover:underline">
                           {client.email}
                         </a>
                       ) : '—'}
@@ -167,7 +167,7 @@ export function RefillsList({ rows }: RefillsListProps) {
                     <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">Phone</dt>
                     <dd className="mt-0.5">
                       {client?.phone ? (
-                        <a href={`tel:${client.phone}`} className="text-primary-600 hover:underline">
+                        <a href={`tel:${client.phone}`} className="text-primary-700 hover:underline">
                           {client.phone}
                         </a>
                       ) : '—'}

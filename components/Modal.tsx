@@ -14,9 +14,14 @@ export function Modal({ isOpen, onClose, title, children, ariaLabel }: ModalProp
   const modalRef = useRef<HTMLDivElement>(null)
   const firstFocusableRef = useRef<HTMLElement | null>(null)
   const lastFocusableRef = useRef<HTMLElement | null>(null)
+  // Store the element that had focus before the modal opened so we can restore it on close
+  const triggerElementRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!isOpen) return
+
+    // Capture the triggering element before we move focus away (WCAG 2.4.3)
+    triggerElementRef.current = document.activeElement as HTMLElement
 
     // Focus trap
     const handleTabKey = (e: KeyboardEvent) => {
@@ -69,6 +74,9 @@ export function Modal({ isOpen, onClose, title, children, ariaLabel }: ModalProp
       document.removeEventListener('keydown', handleTabKey)
       document.removeEventListener('keydown', handleEscape)
       document.body.style.overflow = 'unset'
+      // Return focus to the element that triggered the modal (WCAG 2.4.3)
+      triggerElementRef.current?.focus()
+      triggerElementRef.current = null
     }
   }, [isOpen, onClose])
 

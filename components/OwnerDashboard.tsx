@@ -20,7 +20,7 @@ export function OwnerDashboard({ stats }: OwnerDashboardProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="card">
             <h2 className="text-sm font-semibold text-gray-600 mb-1">Total Orders</h2>
-            <p className="text-3xl font-bold text-primary-600">{stats.totalOrders}</p>
+            <p className="text-3xl font-bold text-primary-700">{stats.totalOrders}</p>
           </div>
           <div className="card">
             <h2 className="text-sm font-semibold text-gray-600 mb-1">New Orders</h2>
@@ -42,7 +42,7 @@ export function OwnerDashboard({ stats }: OwnerDashboardProps) {
             href="/owner/orders"
             className="card hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-start gap-4"
           >
-            <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
+            <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-700">
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 7l8-4 8 4-8 4-8-4z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10l8 4 8-4V7" />

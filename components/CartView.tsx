@@ -143,7 +143,7 @@ export function CartView({ cartItems: initialCartItems }: CartViewProps) {
                   <p className="text-xs sm:text-sm text-gray-600 mt-1">
                     {item.product?.category}
                   </p>
-                  <p className="text-sm sm:text-base font-semibold text-primary-600 mt-1">
+                  <p className="text-sm sm:text-base font-semibold text-primary-700 mt-1">
                     {item.product?.price_display || 'Call'}
                   </p>
                 </div>

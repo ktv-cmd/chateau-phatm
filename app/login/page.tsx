@@ -274,7 +274,7 @@ export default function LoginPage() {
                 Don&apos;t have an account?{' '}
                 <Link
                   href="/signup"
-                  className="font-medium text-primary-600 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+                  className="font-medium text-primary-700 hover:text-primary-800 focus:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
                 >
                   Sign up
                 </Link>
@@ -285,7 +285,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => { setShowForgotPassword((v) => !v); setForgotSent(false) }}
-              className="font-medium text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+              className="font-medium text-primary-700 hover:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
             >
               Forgot password?
             </button>

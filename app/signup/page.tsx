@@ -362,7 +362,7 @@ export default function SignupPage() {
               Already have an account?{' '}
               <Link
                 href="/login"
-                className="font-medium text-primary-600 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+                className="font-medium text-primary-700 hover:text-primary-800 focus:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
               >
                 Log in
               </Link>

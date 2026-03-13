@@ -23,6 +23,7 @@ export function Navigation() {
   const [sessionSynced, setSessionSynced] = useState(false)
   const [searchValue, setSearchValue] = useState(searchParams.get('search') ?? '')
   const [safetyWarnings, setSafetyWarnings] = useState<SearchSafetyWarning[]>([])
+  const userIsAdmin = isAdmin(user?.email)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -78,13 +79,11 @@ export function Navigation() {
 
   useEffect(() => {
     loadUser()
-    loadCartCount()
 
     // Listen for auth changes
     const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
       async (event, session) => {
         loadUser()
-        loadCartCount()
         if (event === 'SIGNED_IN' && session) {
           try {
             await fetch('/api/auth/set-session', {
@@ -104,7 +103,7 @@ export function Navigation() {
       }
     )
 
-    const onCartUpdated = () => loadCartCount()
+    const onCartUpdated = () => loadUser()
     window.addEventListener('cart:updated', onCartUpdated as EventListener)
 
     return () => {
@@ -114,7 +113,7 @@ export function Navigation() {
   }, [])
 
   useEffect(() => {
-    loadCartCount()
+    loadUser()
     setIsMenuOpen(false)
   }, [pathname])
 
@@ -124,6 +123,7 @@ export function Navigation() {
       
       if (!authUser) {
         setUser(null)
+        setCartCount(0)
         return
       }
 
@@ -153,32 +153,25 @@ export function Navigation() {
         .eq('id', authUser.id)
         .single()
 
-      if (error || !data) {
-        // Fallback: if public.users is blocked/misconfigured, still treat as logged-in
-        // Admin is determined by email, not role
-        setUser({
-          id: authUser.id,
-          email: authUser.email || '',
-          created_at: authUser.created_at || new Date().toISOString(),
-        } as User)
-        return
-      }
+      const resolvedUser: User = (error || !data)
+        ? { id: authUser.id, email: authUser.email || '', created_at: authUser.created_at || new Date().toISOString() } as User
+        : data as User
 
-      setUser(data as User)
+      setUser(resolvedUser)
+      loadCartCount(authUser.id)
     } catch (err) {
       logger.error('[Navigation] Error in loadUser:', err)
       setUser(null)
     }
   }
 
-  async function loadCartCount() {
-    const { data: { user: authUser } } = await supabaseClient.auth.getUser()
-    if (!authUser) {
+  async function loadCartCount(userId?: string) {
+    if (!userId) {
       setCartCount(0)
       return
     }
 
-    const { data, error } = await getCartSummary(supabaseClient, authUser.id)
+    const { data, error } = await getCartSummary(supabaseClient, userId)
 
     if (error) {
       setCartCount(0)
@@ -238,29 +231,29 @@ export function Navigation() {
             <div className="hidden md:flex items-center space-x-4">
               {user ? (
                 <>
-                  {isAdmin(user.email) ? (
+                  {userIsAdmin ? (
                     <>
                       <Link
                         href="/owner"
-                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         Dashboard
                       </Link>
                       <Link
                         href="/owner/products"
-                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         Products
                       </Link>
                       <Link
                         href="/owner/orders"
-                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         Orders
                       </Link>
                       <Link
                         href="/owner/refills"
-                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         Refills
                       </Link>
@@ -269,31 +262,31 @@ export function Navigation() {
                     <>
                       <Link
                         href="/products"
-                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         Products
                       </Link>
                       <Link
                         href="/refill"
-                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         Refill
                       </Link>
                       <Link
                         href="/orders"
-                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         My Orders
                       </Link>
                       <Link
                         href="/profile"
-                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         Profile
                       </Link>
                     </>
                   )}
-                  {!isAdmin(user.email) && (
+                  {!userIsAdmin && (
                     <Link
                       href="/cart"
                       className="relative px-3 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -309,10 +302,10 @@ export function Navigation() {
                   )}
                   <button
                     onClick={handleSignOut}
-                    className="px-3 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    Sign Out
-                  </button>
+                      className="px-3 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-900 focus:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[44px]"
+                    >
+                      Sign Out
+                    </button>
                 </>
               ) : (
                 <>
@@ -335,7 +328,7 @@ export function Navigation() {
           </div>
         </div>
 
-        {!isAdmin(user?.email) && (
+        {!userIsAdmin && (
           <div className="border-t border-gray-200/60 bg-white/80">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
               <form
@@ -383,32 +376,32 @@ export function Navigation() {
           <div className="px-3 pt-3 pb-14 space-y-1 max-h-[60vh] overflow-y-auto">
             {user ? (
               <>
-                {isAdmin(user.email) ? (
+                {userIsAdmin ? (
                   <>
                     <Link
                       href="/owner"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Dashboard
                     </Link>
                     <Link
                       href="/owner/products"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Products
                     </Link>
                     <Link
                       href="/owner/orders"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Orders
                     </Link>
                     <Link
                       href="/owner/refills"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Refills
@@ -418,38 +411,38 @@ export function Navigation() {
                   <>
                     <Link
                       href="/products"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Products
                     </Link>
                     <Link
                       href="/refill"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Refill
                     </Link>
                     <Link
                       href="/orders"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       My Orders
                     </Link>
                     <Link
                       href="/profile"
-                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Profile
                     </Link>
                   </>
                 )}
-                {!isAdmin(user.email) && (
+                {!userIsAdmin && (
                   <Link
                     href="/cart"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Cart {cartCount > 0 && `(${cartCount})`}
@@ -460,7 +453,7 @@ export function Navigation() {
                     setIsMenuOpen(false)
                     handleSignOut()
                   }}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   Sign Out
                 </button>
@@ -469,14 +462,14 @@ export function Navigation() {
               <>
                 <Link
                   href="/login"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Log In
                 </Link>
                 <Link
                   href="/signup"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-primary-700 hover:text-primary-800 focus:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sign Up
@@ -491,7 +484,7 @@ export function Navigation() {
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200/60 bg-white/95 backdrop-blur shadow-sm"
         aria-label="Mobile navigation"
       >
-        {isAdmin(user?.email) ? (
+        {userIsAdmin ? (
           /* Admin bottom nav */
           <div className="grid grid-cols-5 py-1">
             <Link
@@ -574,6 +567,7 @@ export function Navigation() {
               }`}
               aria-label="Menu"
               aria-expanded={isMenuOpen}
+              aria-haspopup="dialog"
               aria-controls="mobile-menu"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">

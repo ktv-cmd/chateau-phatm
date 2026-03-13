@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
+import Link from 'next/link'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
 
 export const metadata: Metadata = {
@@ -44,24 +45,29 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           </div>
           {!userIsAdmin && (
             <div className="hidden md:block">
-              <a href="/cart" className="btn-secondary">View cart</a>
+              <Link href="/cart" className="btn-secondary">View cart</Link>
             </div>
           )}
         </div>
 
         {searchParams.welcome === 'true' && (
-          <div className="mb-6 rounded-2xl border border-primary-100 bg-primary-50/60 px-4 py-3 text-primary-900">
+          <div
+            className="mb-6 rounded-2xl border border-primary-100 bg-primary-50/60 px-4 py-3 text-primary-900"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <p className="text-sm">
               <span className="font-semibold">Welcome!</span> You can start shopping now. Want faster checkout?{' '}
-              <a href="/profile" className="font-medium underline underline-offset-2">
+              <Link href="/profile" className="font-medium underline underline-offset-2 text-primary-700 hover:text-primary-800">
                 Complete your profile
-              </a>
+              </Link>
               .
             </p>
           </div>
         )}
 
-        <Suspense fallback={<div>Loading products...</div>}>
+        <Suspense fallback={<div role="status" aria-live="polite" className="py-8 text-center text-gray-600">Loading products…</div>}>
           <ProductsList
             products={products || []}
             categories={categories}

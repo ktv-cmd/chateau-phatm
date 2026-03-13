@@ -7,8 +7,7 @@ import { clearCart } from '@/lib/db/cart'
 import { createOrder, createOrderItems } from '@/lib/db/orders'
 import { upsertCustomerProfile } from '@/lib/db/profiles'
 import { logger } from '@/lib/logger'
-import { CartItem } from '@/lib/types'
-import { CustomerProfile } from '@/lib/types'
+import { CartItem, CustomerProfile } from '@/lib/types'
 
 interface CheckoutFormProps {
   cartItems: (CartItem & { product?: any })[]

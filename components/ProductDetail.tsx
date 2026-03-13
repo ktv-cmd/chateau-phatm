@@ -69,7 +69,7 @@ export function ProductDetail({ product, variants = [], returnTo, isAuthenticate
         <div className="mb-4">
           <Link
             href={backHref}
-            className="inline-flex items-center text-sm text-gray-600 hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+            className="inline-flex items-center text-sm text-gray-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
           >
             {backLabel}
           </Link>
@@ -77,7 +77,7 @@ export function ProductDetail({ product, variants = [], returnTo, isAuthenticate
 
         <nav aria-label="Breadcrumb" className="mb-4">
           <ol className="flex space-x-2 text-sm text-gray-600">
-            <li><Link href="/products" className="hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">Products</Link></li>
+            <li><Link href="/products" className="hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded">Products</Link></li>
             <li aria-hidden="true">/</li>
             <li aria-current="page" className="text-gray-900">{titleText}</li>
           </ol>
@@ -117,7 +117,7 @@ export function ProductDetail({ product, variants = [], returnTo, isAuthenticate
             {product.brand && (
               <p className="text-sm text-gray-600 mb-4">Brand: {product.brand}</p>
             )}
-            <p className="text-3xl font-bold text-primary-600 mb-4">{product.price_display}</p>
+            <p className="text-3xl font-bold text-primary-700 mb-4">{product.price_display}</p>
 
             {hasMultipleVariants && (
               <div className="mb-6">

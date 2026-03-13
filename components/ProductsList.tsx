@@ -349,7 +349,7 @@ export function ProductsList({ products, categories, selectedCategory, searchQue
               {/* Variant Selector */}
               <div className="mt-auto">
                 <div className="mb-3 flex flex-wrap items-center gap-2 sm:h-10 sm:flex-nowrap sm:justify-between">
-                  <span className="text-base sm:text-lg font-bold text-primary-600 leading-6 sm:leading-7">
+                  <span className="text-base sm:text-lg font-bold text-primary-700 leading-6 sm:leading-7">
                     {selectedVariant.price_display}
                   </span>
                   {hasMultipleVariants ? (

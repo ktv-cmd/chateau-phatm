@@ -32,8 +32,9 @@
   }
 
   /* Ensure sufficient color contrast - AA compliant */
+  /* primary-700 (#0369a1) gives 5.93:1 contrast on white, meeting WCAG AA 4.5:1 */
   a {
-    @apply text-primary-600 hover:text-primary-700 focus:text-primary-700;
+    @apply text-primary-700 hover:text-primary-800 focus:text-primary-800;
   }
 
   /* Ensure buttons have sufficient contrast */
@@ -62,9 +63,9 @@
 
   .btn-primary {
     @apply btn text-white shadow-sm;
-    background-image: linear-gradient(135deg, theme(colors.primary.600), theme(colors.primary.500));
+    /* primary-800→primary-700 gradient: white text contrast 7.56:1 and 5.93:1 — both pass WCAG AA 4.5:1 */
+    background-image: linear-gradient(135deg, theme(colors.primary.800), theme(colors.primary.700));
     @apply hover:opacity-95 focus:opacity-95 active:opacity-90;
-    /* Color contrast ratio: 4.5:1 for AA compliance */
   }
 
   .btn-secondary {

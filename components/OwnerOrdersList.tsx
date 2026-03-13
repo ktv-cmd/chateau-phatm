@@ -91,7 +91,7 @@ export function OwnerOrdersList({ orders, selectedStatus }: OwnerOrdersListProps
                     <td className="py-3 px-4">
                       <Link
                         href={`/owner/orders/${order.id}`}
-                        className="text-primary-600 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+                        className="text-primary-700 hover:text-primary-800 focus:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
                       >
                         {order.id.slice(0, 8)}
                       </Link>
