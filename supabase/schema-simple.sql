@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS public.order_items (
   order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
   product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   product_name_snapshot TEXT NOT NULL,
+  product_sku_snapshot TEXT,
   price_display_snapshot TEXT NOT NULL,
   qty INTEGER NOT NULL CHECK (qty > 0),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

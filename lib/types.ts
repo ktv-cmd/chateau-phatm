@@ -101,6 +101,7 @@ export interface OrderItem {
   order_id: string
   product_id: string
   product_name_snapshot: string
+  product_sku_snapshot?: string | null
   price_display_snapshot: string
   qty: number
   created_at: string

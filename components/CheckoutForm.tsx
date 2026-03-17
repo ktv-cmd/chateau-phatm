@@ -156,6 +156,7 @@ export function CheckoutForm({ cartItems: initialCartItems, profile: initialProf
         order_id: order.id,
         product_id: item.product_id,
         product_name_snapshot: item.product?.name || 'Product',
+        product_sku_snapshot: item.product?.sku || null,
         price_display_snapshot: item.product?.price_display || 'Call',
         qty: item.qty
       }))

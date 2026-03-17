@@ -111,6 +111,7 @@ export function OrderDetail({ order, orderItems, showSuccess }: OrderDetailProps
               <thead>
                 <tr className="border-b">
                   <th scope="col" className="text-left py-2 px-4">Product</th>
+                  <th scope="col" className="text-left py-2 px-4">Item ID</th>
                   <th scope="col" className="text-right py-2 px-4">Quantity</th>
                   <th scope="col" className="text-right py-2 px-4">Price</th>
                 </tr>
@@ -119,6 +120,7 @@ export function OrderDetail({ order, orderItems, showSuccess }: OrderDetailProps
                 {orderItems.map((item) => (
                   <tr key={item.id} className="border-b">
                     <td className="py-2 px-4">{item.product_name_snapshot}</td>
+                    <td className="py-2 px-4">{item.product_sku_snapshot || '-'}</td>
                     <td className="text-right py-2 px-4">{item.qty}</td>
                     <td className="text-right py-2 px-4">{item.price_display_snapshot}</td>
                   </tr>
@@ -126,11 +128,11 @@ export function OrderDetail({ order, orderItems, showSuccess }: OrderDetailProps
               </tbody>
               <tfoot>
                 <tr className="border-t">
-                  <td colSpan={2} className="font-semibold py-2 px-4">Total Items:</td>
+                  <td colSpan={3} className="font-semibold py-2 px-4">Total Items:</td>
                   <td className="text-right font-semibold py-2 px-4">{order.total_items}</td>
                 </tr>
                 <tr className="border-t">
-                  <td colSpan={2} className="font-semibold py-2 px-4">Order Total:</td>
+                  <td colSpan={3} className="font-semibold py-2 px-4">Order Total:</td>
                   <td className="text-right font-semibold py-2 px-4 text-primary-700">
                     {computeOrderTotal(orderItems)}
                   </td>

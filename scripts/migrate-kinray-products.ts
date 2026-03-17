@@ -221,13 +221,14 @@ function mapKinrayProductToSchema(row: KinrayProduct, index: number): any {
   const description = row['Description'] || row['DESCRIPTION'] 
   const price = row['Current Retail Price Sell Unit'] || row['Price'] || row['PRICE']
   
-  // SKU is the item number
+  // Use the first Excel column ("Item Number") as the stable external item ID.
+  // `products.id` is UUID in DB, so this value must live in `sku`.
   const sku = cleanText(itemNumber)
   
   // Product name is the description
   let name = cleanText(description)
   if (!name) {
-    name = `Product ${index + 1}`
+    name = sku ? `Product ${sku}` : `Product ${index + 1}`
   }
   
   // Try to extract brand from the description
@@ -387,9 +388,13 @@ async function main() {
     console.log('\n🔄 Mapping products to database schema...')
     const products = kinrayData.map((row, index) => mapKinrayProductToSchema(row, index))
     
-    // Filter out any products without names
-    const validProducts = products.filter(p => p.name && p.name !== 'Product undefined')
+    // Require both name and Item Number (stored as SKU) so each item has a stable ID.
+    const validProducts = products.filter(p => p.name && p.sku)
+    const skippedProducts = products.length - validProducts.length
     console.log(`✅ Mapped ${validProducts.length} valid products`)
+    if (skippedProducts > 0) {
+      console.log(`⚠️  Skipped ${skippedProducts} rows missing Item Number or name`)
+    }
     
     // Show sample mapped product
     if (validProducts.length > 0) {

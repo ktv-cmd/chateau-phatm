@@ -30,4 +30,32 @@ test.describe('owner flow', () => {
     await page.goto('/owner/products')
     await expect(page).toHaveURL(/\/login/)
   })
+
+  test('order detail shows Item ID values', async ({ page }) => {
+    await login(page, {
+      email: ownerEmail!,
+      password: ownerPassword!,
+      path: '/login',
+      expectedRedirect: /\/owner/
+    })
+
+    await page.goto('/owner/orders')
+    await expect(page.getByRole('heading', { name: /^orders$/i })).toBeVisible()
+
+    const firstViewButton = page.getByRole('link', { name: /^view order/i }).first()
+    await expect(firstViewButton).toBeVisible()
+    await firstViewButton.click()
+
+    await expect(page.getByRole('heading', { name: /order items/i })).toBeVisible()
+    const table = page.getByRole('table', { name: /order items/i })
+    await expect(table.getByRole('columnheader', { name: /item id/i })).toBeVisible()
+
+    const itemIdCells = table.locator('tbody tr td:nth-child(2)')
+    await expect(itemIdCells.first()).toBeVisible()
+
+    const nonDashCount = await itemIdCells
+      .filter({ hasNotText: /^-$/ })
+      .count()
+    expect(nonDashCount).toBeGreaterThan(0)
+  })
 })

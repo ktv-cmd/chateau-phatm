@@ -18,7 +18,7 @@ export async function login(
   await page.getByLabel('Email Address').fill(email)
   // Use role+name to target only the password input, not the "Show password" button
   await page.getByRole('textbox', { name: 'Password' }).fill(password)
-  await page.getByRole('button', { name: /sign in/i }).click()
+  await page.getByRole('button', { name: /(sign in|log in)/i }).click()
   if (expectedRedirect) {
     await expect(page).toHaveURL(expectedRedirect)
   }
