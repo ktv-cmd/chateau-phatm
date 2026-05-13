@@ -17,7 +17,7 @@ export default async function OrdersPage() {
     redirect('/login?redirectedFrom=/orders')
   }
 
-  if (isAdmin(user.email)) {
+  if (isAdmin(user)) {
     redirect('/owner/orders')
   }
 

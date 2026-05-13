@@ -20,7 +20,7 @@ interface ProductsPageProps {
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const user = await getCurrentUser()
-  const userIsAdmin = isAdmin(user?.email)
+  const userIsAdmin = isAdmin(user)
   const serverSupabase = await supabaseServerClient()
 
   const { data: products, error } = await listProducts(serverSupabase, {

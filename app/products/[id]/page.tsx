@@ -36,11 +36,11 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
     notFound()
   }
 
-  if (user && !isAdmin(user.email) && product.is_active === false) {
+  if (user && !isAdmin(user) && product.is_active === false) {
     notFound()
   }
 
   const variants = await getProductVariants(serverSupabase, product)
 
-  return <ProductDetail product={product} variants={variants} returnTo={searchParams?.returnTo} isAuthenticated={!!user} isAdmin={isAdmin(user?.email)} />
+  return <ProductDetail product={product} variants={variants} returnTo={searchParams?.returnTo} isAuthenticated={!!user} isAdmin={isAdmin(user)} />
 }

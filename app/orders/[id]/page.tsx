@@ -31,7 +31,7 @@ export default async function OrderPage({ params, searchParams }: OrderPageProps
   }
 
   // Check if user has access (own order or admin)
-  if (!isAdmin(user.email) && order.user_id !== user.id) {
+  if (!isAdmin(user) && order.user_id !== user.id) {
     redirect('/orders')
   }
 

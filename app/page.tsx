@@ -46,7 +46,7 @@ export default async function HomePage({
 }) {
   const user = await getCurrentUser()
   const isAuthenticated = !!user
-  const userIsAdmin = isAdmin(user?.email)
+  const userIsAdmin = isAdmin(user)
   const refillStatus = typeof searchParams?.refill === 'string' ? searchParams.refill : undefined
 
   const serverSupabase = await supabaseServerClient()

@@ -22,7 +22,7 @@ export default async function OwnerOrdersPage({ searchParams }: OwnerOrdersPageP
   if (!user) {
     redirect('/login')
   }
-  if (!isAdmin(user.email)) {
+  if (!isAdmin(user)) {
     redirect('/products')
   }
 

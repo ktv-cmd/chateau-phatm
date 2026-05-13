@@ -13,7 +13,7 @@ import { RefillsList } from '@/components/RefillsList'
 export default async function OwnerRefillRequestsPage() {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
-  if (!isAdmin(user.email)) redirect('/products')
+  if (!isAdmin(user)) redirect('/products')
 
   const serviceSupabase = supabaseServiceClient()
 

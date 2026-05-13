@@ -12,7 +12,7 @@ import { OwnerSettings } from '@/components/OwnerSettings'
 export default async function OwnerSettingsPage() {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
-  if (!isAdmin(user.email)) redirect('/products')
+  if (!isAdmin(user)) redirect('/products')
 
   return (
     <div className="page">

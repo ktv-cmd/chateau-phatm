@@ -16,7 +16,7 @@ export default async function CartPage() {
   if (!user) {
     redirect('/login?redirectedFrom=/cart')
   }
-  if (isAdmin(user.email)) {
+  if (isAdmin(user)) {
     redirect('/owner')
   }
 

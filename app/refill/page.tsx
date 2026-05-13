@@ -43,7 +43,7 @@ export default async function RefillPage({
     redirect('/login?redirectedFrom=/refill')
   }
 
-  if (isAdmin(user.email)) {
+  if (isAdmin(user)) {
     redirect('/owner/refills')
   }
 

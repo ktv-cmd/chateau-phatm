@@ -18,7 +18,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     redirect('/login?redirectedFrom=/profile')
   }
 
-  if (isAdmin(user.email)) {
+  if (isAdmin(user)) {
     redirect('/owner')
   }
 

@@ -15,7 +15,7 @@ export default async function NewProductPage() {
   if (!user) {
     redirect('/login')
   }
-  if (!isAdmin(user.email)) {
+  if (!isAdmin(user)) {
     redirect('/products')
   }
 
