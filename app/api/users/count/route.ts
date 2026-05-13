@@ -6,7 +6,7 @@ import { supabaseServiceClient } from '@/lib/db/supabaseServiceClient'
 export async function GET() {
   try {
     const currentUser = await getCurrentUser()
-    if (!currentUser || !isAdmin(currentUser.email)) {
+    if (!currentUser || !isAdmin(currentUser)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -51,8 +51,7 @@ export async function GET() {
       }, { status: 500 })
     }
 
-    // Count by admin status (hardcoded email)
-    const owners = users?.filter(u => u.email?.toLowerCase() === 'admin@chateau-demo.com').length || 0
+    const owners = users?.filter(u => u.role === 'ADMIN').length || 0
     const customers = (usersCount || 0) - owners
 
     return NextResponse.json({
@@ -65,7 +64,7 @@ export async function GET() {
       },
       users: users?.map(u => ({
         email: u.email,
-        isAdmin: u.email?.toLowerCase() === 'admin@chateau-demo.com',
+        isAdmin: u.role === 'ADMIN',
         created_at: u.created_at,
         hasProfile: false // Will check below
       })) || [],

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const user = await getCurrentUser()
-  if (!user || !isAdmin(user.email)) {
+  if (!user || !isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 

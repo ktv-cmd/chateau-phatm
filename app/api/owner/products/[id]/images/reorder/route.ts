@@ -22,7 +22,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   if (!currentUser) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!isAdmin(currentUser.email)) {
+  if (!isAdmin(currentUser)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

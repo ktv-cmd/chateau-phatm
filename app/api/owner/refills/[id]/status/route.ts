@@ -7,7 +7,7 @@ const allowedStatuses = new Set(['NEW', 'IN_PROGRESS', 'COMPLETED', 'CANCELED'])
 
 export async function PATCH(request: NextRequest, context: { params: { id: string } }) {
   const user = await getCurrentUser()
-  if (!user || !isAdmin(user.email)) {
+  if (!user || !isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 

@@ -5,7 +5,7 @@ import { supabaseServiceClient } from '@/lib/db/supabaseServiceClient'
 
 export async function POST(request: NextRequest) {
   const user = await getCurrentUser()
-  if (!user || !isAdmin(user.email)) {
+  if (!user || !isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 

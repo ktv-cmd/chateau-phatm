@@ -6,7 +6,7 @@ import { isAdmin } from '@/lib/roles'
 export async function GET() {
   try {
     const currentUser = await getCurrentUser()
-    if (!currentUser || !isAdmin(currentUser.email)) {
+    if (!currentUser || !isAdmin(currentUser)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -61,7 +61,7 @@ export async function GET() {
       publicUsers: publicUsers?.map(u => ({
         id: u.id,
         email: u.email,
-        isAdmin: u.email?.toLowerCase() === 'admin@chateau-demo.com',
+        isAdmin: u.role === 'ADMIN',
         createdAt: u.created_at
       })) || [],
       missingInPublic: missingInPublic.map(u => ({
