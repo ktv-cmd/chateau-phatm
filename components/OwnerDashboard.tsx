@@ -7,9 +7,10 @@ interface OwnerDashboardProps {
     newOrders: number
     newRefills: number
   }
+  isSuperAdmin?: boolean
 }
 
-export function OwnerDashboard({ stats }: OwnerDashboardProps) {
+export function OwnerDashboard({ stats, isSuperAdmin }: OwnerDashboardProps) {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-7xl mx-auto">
@@ -101,6 +102,26 @@ export function OwnerDashboard({ stats }: OwnerDashboardProps) {
               <p className="text-sm text-gray-600">Manage admin account and password</p>
             </div>
           </Link>
+
+          {isSuperAdmin && (
+            <Link
+              href="/owner/employees"
+              className="card hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-primary-500 flex items-start gap-4"
+            >
+              <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </span>
+              <div>
+                <h2 className="text-lg font-semibold mb-1">Employees</h2>
+                <p className="text-sm text-gray-600">View and manage staff admin access</p>
+              </div>
+            </Link>
+          )}
         </div>
       </div>
     </div>

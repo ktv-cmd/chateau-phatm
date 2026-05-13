@@ -2,20 +2,22 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Order, OrderItem } from '@/lib/types'
+import { Order, OrderItem, OrderStatusHistory } from '@/lib/types'
 import { computeOrderTotal } from '@/lib/utils'
 
 interface OwnerOrderDetailProps {
   order: Order
   orderItems: OrderItem[]
   customerEmail: string
+  statusHistory?: OrderStatusHistory[]
 }
 
-export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrderDetailProps) {
+export function OwnerOrderDetail({ order, orderItems, customerEmail, statusHistory = [] }: OwnerOrderDetailProps) {
   const router = useRouter()
   const [isUpdating, setIsUpdating] = useState(false)
   const [newStatus, setNewStatus] = useState<Order['status']>(order.status)
   const [statusError, setStatusError] = useState<string | null>(null)
+  const [showHistory, setShowHistory] = useState(false)
 
   async function handleStatusUpdate() {
     setIsUpdating(true)
@@ -112,6 +114,15 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
                 })}
               </p>
               <p className="text-gray-600 mt-1">Customer: {customerEmail}</p>
+              {order.updated_by_name && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Last updated by: <span className="font-medium text-gray-700">{order.updated_by_name}</span>
+                  {' — '}
+                  {new Date(order.updated_at).toLocaleDateString('en-US', {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                  })}
+                </p>
+              )}
             </div>
             {getStatusBadge(order.status)}
           </div>
@@ -180,6 +191,48 @@ export function OwnerOrderDetail({ order, orderItems, customerEmail }: OwnerOrde
           )}
 
         </div>
+
+        {statusHistory.length > 0 && (
+          <div className="card mb-6 print:hidden">
+            <button
+              type="button"
+              onClick={() => setShowHistory((v) => !v)}
+              className="flex items-center justify-between w-full text-left"
+              aria-expanded={showHistory}
+            >
+              <h2 className="text-lg font-semibold">Status History ({statusHistory.length})</h2>
+              <svg
+                className={`h-5 w-5 text-gray-500 transition-transform ${showHistory ? 'rotate-180' : ''}`}
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showHistory && (
+              <div className="mt-4 divide-y divide-gray-100">
+                {statusHistory.map((entry) => (
+                  <div key={entry.id} className="py-3 flex items-start justify-between gap-4">
+                    <div>
+                      <span className="text-sm font-medium text-gray-900">{entry.updated_by_name}</span>
+                      <span className="text-sm text-gray-500 ml-1">({entry.updated_by_email})</span>
+                      <div className="text-sm text-gray-600 mt-0.5">
+                        {entry.old_status
+                          ? <>{entry.old_status} → <span className="font-medium">{entry.new_status}</span></>
+                          : <>Set to <span className="font-medium">{entry.new_status}</span></>
+                        }
+                      </div>
+                    </div>
+                    <span className="text-xs text-gray-400 whitespace-nowrap mt-0.5">
+                      {new Date(entry.updated_at).toLocaleDateString('en-US', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="card mb-6">
           <h2 className="text-2xl font-semibold mb-4">Order Items</h2>

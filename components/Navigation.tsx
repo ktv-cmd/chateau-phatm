@@ -11,7 +11,7 @@ import { supabaseClient } from '@/lib/db/supabaseClient'
 import { getCartSummary } from '@/lib/db/cart'
 import { logger } from '@/lib/logger'
 import { User } from '@/lib/types'
-import { isAdmin } from '@/lib/roles'
+import { isAdminEmail, isSuperAdmin } from '@/lib/roles'
 
 export function Navigation() {
   const router = useRouter()
@@ -23,7 +23,8 @@ export function Navigation() {
   const [sessionSynced, setSessionSynced] = useState(false)
   const [searchValue, setSearchValue] = useState(searchParams.get('search') ?? '')
   const [safetyWarnings, setSafetyWarnings] = useState<SearchSafetyWarning[]>([])
-  const userIsAdmin = isAdmin(user?.email)
+  const userIsAdmin = isAdminEmail(user?.email)
+  const userIsSuperAdmin = isSuperAdmin(user?.email)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -257,6 +258,14 @@ export function Navigation() {
                       >
                         Refills
                       </Link>
+                      {userIsSuperAdmin && (
+                        <Link
+                          href="/owner/employees"
+                          className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        >
+                          Employees
+                        </Link>
+                      )}
                     </>
                   ) : (
                     <>
@@ -406,6 +415,15 @@ export function Navigation() {
                     >
                       Refills
                     </Link>
+                    {userIsSuperAdmin && (
+                      <Link
+                        href="/owner/employees"
+                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-700 focus:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Employees
+                      </Link>
+                    )}
                   </>
                 ) : (
                   <>

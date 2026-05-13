@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth-server'
 import { isAdmin } from '@/lib/roles'
 import { supabaseServerClient } from '@/lib/db/supabaseServerClient'
+import { supabaseServiceClient } from '@/lib/db/supabaseServiceClient'
 
 const allowedStatuses = new Set([
   'NEW',
@@ -14,7 +15,7 @@ const allowedStatuses = new Set([
 
 export async function PATCH(request: NextRequest, context: { params: { id: string } }) {
   const user = await getCurrentUser()
-  if (!user || !isAdmin(user.email)) {
+  if (!user || !isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 
@@ -32,9 +33,26 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
   }
 
   const serverSupabase = await supabaseServerClient()
+
+  // Fetch current status before update (for audit history)
+  const { data: currentOrder } = await serverSupabase
+    .from('orders')
+    .select('status')
+    .eq('id', id)
+    .single()
+
+  const updatedByName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email
+  const updatedByEmail = user.email
+  const now = new Date().toISOString()
+
   const { data, error } = await serverSupabase
     .from('orders')
-    .update({ status, updated_at: new Date().toISOString() })
+    .update({
+      status,
+      updated_at: now,
+      updated_by_name: updatedByName,
+      updated_by_email: updatedByEmail,
+    })
     .eq('id', id)
     .select()
     .single()
@@ -55,6 +73,16 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
   if (!data) {
     return NextResponse.json({ error: 'Order not found' }, { status: 404 })
   }
+
+  // Insert audit history using service role to bypass RLS on history table
+  await supabaseServiceClient().from('order_status_history').insert({
+    order_id: id,
+    old_status: currentOrder?.status ?? null,
+    new_status: status,
+    updated_by_name: updatedByName,
+    updated_by_email: updatedByEmail,
+    updated_at: now,
+  })
 
   return NextResponse.json({ success: true, order: data })
 }

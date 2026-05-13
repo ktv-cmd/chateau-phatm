@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { isAdmin } from '@/lib/roles'
+import { isAdminEmail } from '@/lib/roles'
 
 export async function middleware(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -48,7 +48,7 @@ export async function middleware(request: NextRequest) {
 
   // Redirect logged-in users away from /login based on role
   if (request.nextUrl.pathname === '/login' && user) {
-    if (isAdmin(user.email)) {
+    if (isAdminEmail(user.email)) {
       return NextResponse.redirect(new URL('/owner', request.url))
     } else {
       const redirectTo = request.nextUrl.searchParams.get('redirectedFrom')

@@ -1,12 +1,13 @@
-// Role is deprecated - we now use email-based admin check
-// Keeping for backward compatibility during migration
 export type UserRole = 'CUSTOMER' | 'ADMIN'
 
 export interface User {
   id: string
   email: string
+  role: UserRole
+  first_name?: string | null
+  last_name?: string | null
   created_at: string
-  role?: UserRole // Optional for backward compatibility
+  updated_at?: string
 }
 
 export interface CustomerProfile {
@@ -93,6 +94,18 @@ export interface Order {
   total_items: number
   sheet_sync_failed: boolean
   sheet_sync_error: string | null
+  updated_at: string
+  updated_by_name?: string | null
+  updated_by_email?: string | null
+}
+
+export interface OrderStatusHistory {
+  id: string
+  order_id: string
+  old_status: string | null
+  new_status: string
+  updated_by_name: string
+  updated_by_email: string
   updated_at: string
 }
 

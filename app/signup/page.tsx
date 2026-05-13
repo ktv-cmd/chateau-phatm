@@ -6,6 +6,8 @@ import { supabaseClient, isSupabaseConfigured } from '@/lib/db/supabaseClient'
 import { logger } from '@/lib/logger'
 
 export default function SignupPage() {
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -20,11 +22,12 @@ export default function SignupPage() {
   const [confirmPasswordError, setConfirmPasswordError] = useState('')
   const supabaseReady = isSupabaseConfigured()
 
+  const isEmployeeEmail = email.toLowerCase().endsWith('@chateau.com')
+
   useEffect(() => {
     document.title = 'Create Account | Chateau Drug & Homecare'
   }, [])
 
-  // Real-time email validation
   function validateEmail(emailValue: string) {
     if (!emailValue) {
       setEmailError('')
@@ -39,7 +42,6 @@ export default function SignupPage() {
     return true
   }
 
-  // Real-time password validation
   function validatePassword(passwordValue: string) {
     if (!passwordValue) {
       setPasswordError('')
@@ -57,13 +59,10 @@ export default function SignupPage() {
     e.preventDefault()
     setError('')
     setSuccess(false)
-
-    // Clear previous errors
     setEmailError('')
     setPasswordError('')
     setConfirmPasswordError('')
 
-    // Validate fields
     if (!email.trim()) {
       setError('Email address is required')
       setEmailError('Email address is required')
@@ -73,6 +72,18 @@ export default function SignupPage() {
     if (!validateEmail(email)) {
       setError(emailError || 'Please enter a valid email address')
       return
+    }
+
+    // Name fields are required only for employee (@chateau.com) accounts
+    if (isEmployeeEmail) {
+      if (!firstName.trim()) {
+        setError('First name is required for employee accounts')
+        return
+      }
+      if (!lastName.trim()) {
+        setError('Last name is required for employee accounts')
+        return
+      }
     }
 
     if (!supabaseReady) {
@@ -100,12 +111,21 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
+      const signUpOptions: Parameters<typeof supabaseClient.auth.signUp>[0]['options'] = {
+        emailRedirectTo: `${window.location.origin}/products`,
+      }
+
+      if (isEmployeeEmail) {
+        signUpOptions.data = {
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+        }
+      }
+
       const { data, error: signUpError } = await supabaseClient.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/products`,
-        },
+        options: signUpOptions,
       })
 
       if (signUpError) {
@@ -115,29 +135,21 @@ export default function SignupPage() {
       }
 
       if (data.user) {
-        // Ensure user record exists in public.users
-        // The trigger should create it, but we'll ensure it exists via API route if user is logged in
-        // If no session (email confirmation required), the trigger should handle it when email is confirmed
         if (data.session) {
-          // User is logged in - use API route to ensure user record exists
           try {
             const response = await fetch('/api/users/create', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
+              headers: { 'Content-Type': 'application/json' },
             })
 
-                if (!response.ok) {
-                  const errorData = await response.json().catch(() => ({}))
-                  logger.error('Failed to ensure user record exists:', errorData)
-              // Try direct insert as fallback (will work if INSERT policy exists)
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}))
+              logger.error('Failed to ensure user record exists:', errorData)
               try {
                 const { error: insertError } = await supabaseClient.from('users').insert({
-                    id: data.user.id,
-                  email: data.user.email || email
-                  })
-
+                  id: data.user.id,
+                  email: data.user.email || email,
+                })
                 if (insertError && !insertError.message.includes('duplicate')) {
                   logger.error('Direct insert also failed:', insertError)
                 }
@@ -147,7 +159,6 @@ export default function SignupPage() {
             }
           } catch (err) {
             logger.error('Error ensuring user record:', err)
-            // Don't fail signup - trigger should handle it
           }
         }
 
@@ -156,11 +167,9 @@ export default function SignupPage() {
         setNeedsVerification(!data.session)
         setIsLoading(false)
 
-        // Only auto-redirect when email verification is NOT required.
-        // If verification is needed, user must act on the email — don't redirect.
         if (data.session) {
           setTimeout(() => {
-            window.location.href = '/products?welcome=true'
+            window.location.href = isEmployeeEmail ? '/owner' : '/products?welcome=true'
           }, 2500)
         }
       } else {
@@ -180,7 +189,7 @@ export default function SignupPage() {
         <div>
           <h1 className="text-3xl font-bold text-center">Create Account</h1>
           <p className="mt-2 text-center text-gray-600">
-            Create an account to start ordering
+            {isEmployeeEmail ? 'Create your employee account' : 'Create an account to start ordering'}
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
@@ -199,9 +208,11 @@ export default function SignupPage() {
                   <p className="text-sm mt-1">
                     {needsVerification
                       ? 'Please check your email to verify your account. Once verified, you can sign in.'
-                      : 'Your account is ready.'}
+                      : isEmployeeEmail
+                        ? 'Your employee account is ready. Redirecting to admin panel...'
+                        : 'Your account is ready.'}
                   </p>
-                  {!needsVerification && (
+                  {!needsVerification && !isEmployeeEmail && (
                     <a
                       href="/products?welcome=true"
                       className="mt-2 inline-block text-sm font-medium text-green-800 underline underline-offset-2 focus:outline-none focus:ring-2 focus:ring-green-600 rounded"
@@ -252,6 +263,43 @@ export default function SignupPage() {
                 </p>
               )}
             </div>
+
+            {/* Name fields — shown only for @chateau.com employee accounts */}
+            {isEmployeeEmail && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="firstName" className="label">First Name</label>
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    autoComplete="given-name"
+                    required
+                    aria-required="true"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="input"
+                    placeholder="Sarah"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="label">Last Name</label>
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    autoComplete="family-name"
+                    required
+                    aria-required="true"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="input"
+                    placeholder="Johnson"
+                  />
+                </div>
+              </div>
+            )}
+
             <div>
               <label htmlFor="password" className="label">
                 Password
@@ -271,9 +319,9 @@ export default function SignupPage() {
                   }}
                   onInput={(e) => setPassword((e.currentTarget as HTMLInputElement).value)}
                   onBlur={(e) => validatePassword(e.target.value)}
-                className={passwordError ? 'input-error pr-20' : 'input pr-20'}
-                aria-describedby={passwordError ? 'password-error' : undefined}
-                aria-invalid={passwordError ? 'true' : 'false'}
+                  className={passwordError ? 'input-error pr-20' : 'input pr-20'}
+                  aria-describedby={passwordError ? 'password-error' : undefined}
+                  aria-invalid={passwordError ? 'true' : 'false'}
                   placeholder="Enter your password"
                 />
                 <button

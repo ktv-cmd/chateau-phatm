@@ -58,4 +58,50 @@ test.describe('owner flow', () => {
       .count()
     expect(nonDashCount).toBeGreaterThan(0)
   })
+
+  test('updating order status shows "last updated by" line', async ({ page }) => {
+    await login(page, {
+      email: ownerEmail!,
+      password: ownerPassword!,
+      path: '/login',
+      expectedRedirect: /\/owner/
+    })
+
+    await page.goto('/owner/orders')
+    const firstViewButton = page.getByRole('link', { name: /^view order/i }).first()
+    await expect(firstViewButton).toBeVisible()
+    await firstViewButton.click()
+
+    // Pick a status that differs from the current one (button is disabled when same)
+    const statusSelect = page.locator('#status-select')
+    const currentStatus = await statusSelect.inputValue()
+    const nextStatus = currentStatus === 'CONFIRMED' ? 'READY' : 'CONFIRMED'
+    await statusSelect.selectOption(nextStatus)
+    await page.getByRole('button', { name: /update order status/i }).click()
+    await expect(page.getByText(/last updated by/i)).toBeVisible()
+  })
+
+  test('super admin can access /owner/employees', async ({ page }) => {
+    await login(page, {
+      email: ownerEmail!,
+      password: ownerPassword!,
+      path: '/login',
+      expectedRedirect: /\/owner/
+    })
+
+    await page.goto('/owner/employees')
+    await expect(page.getByRole('heading', { name: /employees/i })).toBeVisible()
+  })
+
+  test('super admin can access /owner/audit', async ({ page }) => {
+    await login(page, {
+      email: ownerEmail!,
+      password: ownerPassword!,
+      path: '/login',
+      expectedRedirect: /\/owner/
+    })
+
+    await page.goto('/owner/audit')
+    await expect(page.getByRole('heading', { name: /audit log/i })).toBeVisible()
+  })
 })
